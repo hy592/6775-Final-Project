@@ -20,10 +20,10 @@ float x2_debug[150][65];
 
 AHC::AHC(data_type_x x_init[N], data_type_J J_init[N][N]){
 // Partition local variables to improve bandwidth
-#pragma HLS ARRAY_PARTITION variable=this->J dim=1 complete
-#pragma HLS ARRAY_PARTITION variable=this->x dim=1 complete
-#pragma HLS ARRAY_PARTITION variable=this->MVM_out dim=1 complete
-#pragma HLS ARRAY_PARTITION variable=this->e dim=1 complete
+#pragma HLS ARRAY_PARTITION variable=this->J dim=1 factor=8
+#pragma HLS ARRAY_PARTITION variable=this->x dim=1 factor=8
+#pragma HLS ARRAY_PARTITION variable=this->MVM_out dim=1 factor=8
+#pragma HLS ARRAY_PARTITION variable=this->e dim=1 factor=8
 
 	// Initialize the AHC solver
 	dt   = 0.01;
@@ -79,6 +79,7 @@ void AHC::square(){
 // This function update the lastSpins based on the current spin values
 // This is used to determine the sign of the spins in the MVM
 void AHC::setSpins(){
+	#pragma HLS PIPELINE
 	setSpins_loop:
 	for(int i =0; i < N; i++){
 	#pragma HLS UNROLL FACTOR=8
@@ -123,17 +124,18 @@ void AHC::matmul()
 
 // Calculates the Ising energy
 data_type_e AHC::IsingEnergy(){
-	// #pragma HLS PIPELINE
+	#pragma HLS PIPELINE
 	data_type_e energy = 0.0;
 	IsingEnergy_loop: for(int i = 0; i < N; i++){
+		#pragma HLS UNROLL factor=8
+		data_type_e temp;
 		if(this->lastSpins[i]==1){
-			data_type_e temp = -(this->MVM_out[i]) >> 1;
-			energy += temp;
+			temp = -((this->MVM_out[i]) >> 1);
 		}
 		else if(this->lastSpins[i]==-1){
-			data_type_e temp = this->MVM_out[i] >> 1;
-			energy += temp;
+			temp = (this->MVM_out[i] >> 1);
 		}
+		energy += temp;
 	}
 	return energy;
 }
@@ -142,14 +144,14 @@ data_type_e AHC::IsingEnergy(){
 void AHC::update(){
 	#pragma HLS INLINE off
 	#pragma HLS PIPELINE
-	#pragma HLS LATENCY min=4 max=10
+	// #pragma HLS LATENCY min=4 max=10
 
 	update_spin_and_error:
 	for(int i=0;i<N;i++){
 		#pragma HLS UNROLL factor=8
 		// Update spin vector
 		this->x[i] += dt * (coupling_strength * this->MVM_out[i])*this->e[i];
-		this->xx[i] = this->x[i] >> 4;
+		this->xx[i] = (this->x[i] >> 4);
 		this->x[i] += -dt * this->x[i] * ((data_type_x(0.02)) + mu*this->xx[i]);
 		this->de[i] = dt*(-beta * this->e[i] * (this->xx[i] - target_a));
         this->e[i] += de[i];
@@ -158,10 +160,10 @@ void AHC::update(){
 
 void AHC::reset(){
 	#pragma HLS INLINE off
-//	#pragma HLS PIPELINE
+	#pragma HLS PIPELINE
 	// Reset MVM
 	reset_MVM:for(int i=0;i<N;i++){
-	#pragma HLS UNROLL
+	#pragma HLS UNROLL factor=8
 		this->MVM_out[i] = 0.0;
 	}
 }
@@ -188,6 +190,7 @@ void AHC::ahc_solver(){
 
 	setSpins();	// initialize vectors
 	matmul();
+
 	iterations:
 	for(int time_step=0; time_step < this->num_time_steps; time_step++){
 		update();

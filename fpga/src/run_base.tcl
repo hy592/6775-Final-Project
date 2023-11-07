@@ -22,10 +22,10 @@ add_files -tb AHC_test_simple.cpp -cflags "-std=c++11"
 open_solution "solution1" 
 
 # Use UltraScale device
-set_part {xcvu9p_CIV-fsgd2104-3-e}
+# set_part {xcvu9p_CIV-fsgd2104-3-e}
 
 # Use Zynq device
-# set_part {xc7z020clg484-1}
+set_part {xc7z020clg484-1}
 
 # Target clock period is 10ns
 create_clock -period 10 -name default
