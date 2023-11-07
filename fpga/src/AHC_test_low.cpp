@@ -12,7 +12,7 @@ using namespace std;
 //std::string data_path = "C:\\Users\\user\\Documents\\GitHub\\DesignProject\\IsingMachine\\data\\";
 std::string data_path = "/root/GitHub_Linux/MIMO_Ising/data";
 
-const int matrix_size = 65; // Size of the matrix, N
+const int matrix_size = N; // Size of the matrix, N
 
 /*
   This function is used to test the AHC solver
