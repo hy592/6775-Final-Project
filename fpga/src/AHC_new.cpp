@@ -51,12 +51,13 @@ void AHC::ahc_solver(){
 		matmul(i);
 	}
 
-	ahc_solver_time_step:for(int time_step=0; time_step < this->num_time_steps; time_step++){
+	// ahc_solver_time_step:for(int time_step=0; time_step < this->num_time_steps; time_step++){
+	ahc_solver_time_step:for(int time_step=0; time_step < 200; time_step++){
 		// #pragma HLS pipeline 
 		#pragma HLS latency min=4 max=5
 		#pragma HLS pipeline off
 		data_type_e energy = 0.0;
-		ahc_solver_chan1:for(int i=0; i<N; i++){
+		ahc_solver_update:for(int i=0; i<N; i++){
 			#pragma HLS unroll factor=8
             update(i);
             setSpins(i);
@@ -64,15 +65,15 @@ void AHC::ahc_solver(){
 		ahc_solver_matmul:for(int i=0; i<N; i++){
             matmul(i);
 		}
-		ahc_solver_chan2:for(int i=0; i<N; i++){
-            setSpins(i);
+		ahc_solver_energy:for(int i=0; i<N; i++){
+            // setSpins(i);
             energy += IsingEnergy(i);
         }
         // find bestEnergy for all iteration
 		if(energy < this->bestEnergy){
 			bestEnergy = energy;
 			#pragma HLS pipeline off
-			ahc_solver_energy:for(int k = 0; k < N; k++){
+			ahc_solver_best_energy:for(int k = 0; k < N; k++){
 				#pragma HLS unroll factor=8
 				bestSpins[k] = this->lastSpins[k];
 			}
