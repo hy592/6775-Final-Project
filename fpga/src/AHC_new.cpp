@@ -179,6 +179,28 @@ data_type_e AHC::IsingEnergy(int i){
 	return temp;
 }
 
+void AHC::updateSpins(data_type_x x_init[N])
+{
+	#ifdef DEBUG
+		cout << "SPINS INIT" << endl;
+	#endif
+	initialize_vectors:for(int i=0;i<N;i++){
+		this->e[i] = 1.0;
+		this->x[i] = x_init[i];
+		this->MVM_out[i] = 0.0;
+		this->lastSpins[i] = x_init[i];
+		// this->de[i] = 0;
+		// this->coupling_strength = coupling_strength_new;
+		// this->mu = new_mu;
+		#ifdef DEBUG
+			cout << this->x[i] << " ";
+		#endif
+	}
+	#ifdef DEBUG
+	cout << endl;
+	#endif
+}
+
 void ahc_top(
 	const data_type_J J_matrix[N][N], 
 	const data_type_x x_init[N], 
