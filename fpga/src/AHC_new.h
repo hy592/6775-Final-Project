@@ -42,7 +42,7 @@ class AHC{
 	spin_sign bestSpins[N];
 	spin_sign lastSpins[N];
 
-    AHC(data_type_x x_init[N], data_type_J J_init[N][N]);
+    AHC(const data_type_x x_init[N], const data_type_J J_init[N][N]);
 
     void ahc_solver();
     // void square(int i);
@@ -54,7 +54,7 @@ class AHC{
 };
 
 void ahc_top(
-    data_type_J J_matrix[N][N], 
-    data_type_x x_init[N], 
+    const data_type_J J_matrix[N][N], 
+    const data_type_x x_init[N], 
     spin_sign bestSpinsOut[N]
 );

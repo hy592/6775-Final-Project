@@ -1,6 +1,6 @@
 #include "AHC_new.h"
 
-AHC::AHC(data_type_x x_init[N], data_type_J J_init[N][N]){
+AHC::AHC(const data_type_x x_init[N], const data_type_J J_init[N][N]){
 // Partition local variables to improve bandwidth
 #pragma HLS ARRAY_PARTITION variable=this->J dim=2 factor=8
 #pragma HLS ARRAY_PARTITION variable=this->x dim=1 factor=8
@@ -54,7 +54,7 @@ void AHC::ahc_solver(){
 	// ahc_solver_time_step:for(int time_step=0; time_step < this->num_time_steps; time_step++){
 	ahc_solver_time_step:for(int time_step=0; time_step < 200; time_step++){
 		// #pragma HLS pipeline 
-		#pragma HLS latency min=4 max=5
+		// #pragma HLS latency min=4 max=5
 		#pragma HLS pipeline off
 		data_type_e energy = 0.0;
 		ahc_solver_update:for(int i=0; i<N; i++){
@@ -172,14 +172,15 @@ data_type_e AHC::IsingEnergy(int i){
 }
 
 void ahc_top(
-	data_type_J J_matrix[N][N], 
-	data_type_x x_init[N], 
+	const data_type_J J_matrix[N][N], 
+	const data_type_x x_init[N], 
 	spin_sign bestSpinsOut[N]
 ){
 	// Partition the first dim
 	// #pragma HLS ARRAY_PARTITION variable=J_matrix dim=1 complete
 	// #pragma HLS ARRAY_PARTITION variable=x_init dim=1 complete
-
+	#pragma HLS INTERFACE bram port=J_matrix
+	#pragma HLS INTERFACE bram port=x_init
 	#pragma HLS INTERFACE bram port=bestSpinsOut
 	static AHC ahc_instance(x_init, J_matrix);
 	ahc_instance.ahc_solver();
