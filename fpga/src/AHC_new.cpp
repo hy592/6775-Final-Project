@@ -2,37 +2,39 @@
 
 AHC::AHC(const data_type_x x_init[N], const data_type_J J_init[N][N]){
 // Partition local variables to improve bandwidth
-#pragma HLS ARRAY_PARTITION variable=this->J dim=2 factor=8
-#pragma HLS ARRAY_PARTITION variable=this->x dim=1 factor=8
-#pragma HLS ARRAY_PARTITION variable=this->MVM_out dim=1 factor=8
-#pragma HLS ARRAY_PARTITION variable=this->e dim=1 factor=8
-#pragma HLS ARRAY_PARTITION variable=this->bestSpins dim=1 factor=8
-#pragma HLS ARRAY_PARTITION variable=this->lastSpins dim=1 factor=8
+#pragma HLS ARRAY_PARTITION variable=this->J dim=2 complete
+#pragma HLS ARRAY_PARTITION variable=this->x dim=1 complete
+#pragma HLS ARRAY_PARTITION variable=this->MVM_out dim=1 complete
+#pragma HLS ARRAY_PARTITION variable=this->e dim=1 complete
+#pragma HLS ARRAY_PARTITION variable=this->bestSpins dim=1 complete
+#pragma HLS ARRAY_PARTITION variable=this->lastSpins dim=1 complete
 	// Initialize the AHC solver
-	dt   = 0.01;
-	r    = 0.98;
-	beta = 0.1;
-	coupling_strength = 0.020;
-	mu = 1.0;
-	num_time_steps = 200;
-	target_a_baseline = 0.2;
-	target_a = target_a_baseline;
+	// dt   = 0.01;
+	// r    = 0.98;
+	// beta = 0.1;
+	// coupling_strength = 0.020;
+	// mu = 1.0;
+	// num_time_steps = 200;
+	// target_a_baseline = 0.2;
+	// target_a = target_a_baseline;
+	target_a = 0.2;
 
 	// Initialize the spins, J matrix and MVM output
-	#pragma HLS pipeline off
 	Initialize:for(int i=0;i<N;i++){
+		#pragma HLS pipeline off
+		#pragma HLS unroll factor=8
 		// #pragma HLS pipeline 
-		e[i] = 1.0;
+		this->e[i] = 1.0;
 		this->x[i] = x_init[i];
-		MVM_out[i] = 0.0;
+		this->MVM_out[i] = 0.0;
 		this->lastSpins[i] = x_init[i];
 	}
 
 	Initialize_J:for(int j=0;j<N;j++){
 		// #pragma HLS pipeline 
-		#pragma HLS pipeline off
 		Initialize_J_inn:for(int i=0;i<N;i++){
-		#pragma HLS unroll factor=8
+			#pragma HLS pipeline off
+			#pragma HLS unroll factor=8
             this->J[i][j] = J_init[i][j];
         }
     }
@@ -44,38 +46,43 @@ void AHC::ahc_solver(){
 	#pragma HLS ARRAY_PARTITION variable=dx2 dim=0 complete
 	#pragma HLS ARRAY_PARTITION variable=de dim=0 complete
 
-	#pragma HLS pipeline off
 	Initialize_ahc_solver:for(int i=0; i<N; i++){
+		#pragma HLS pipeline off
 		// #pragma HLS pipeline 
+		#pragma HLS unroll factor=8
 		setSpins(i);	// initialize vectors
 		matmul(i);
 	}
 
 	// ahc_solver_time_step:for(int time_step=0; time_step < this->num_time_steps; time_step++){
-	ahc_solver_time_step:for(int time_step=0; time_step < 200; time_step++){
-		// #pragma HLS pipeline 
+	ahc_solver_time_step:for(int time_step=0; time_step < num_time_step; time_step++){
+		// #pragma HLS pipeline off
+		// #pragma HLS pipeline
 		// #pragma HLS latency min=4 max=5
-		#pragma HLS pipeline off
+		
 		data_type_e energy = 0.0;
 		ahc_solver_update:for(int i=0; i<N; i++){
-			#pragma HLS unroll factor=8
+			#pragma HLS pipeline
             update(i);
             setSpins(i);
 		}
 		ahc_solver_matmul:for(int i=0; i<N; i++){
+			#pragma HLS pipeline
+			// #pragma HLS LATENCY min=4 max=5
             matmul(i);
-		}
-		ahc_solver_energy:for(int i=0; i<N; i++){
-            // setSpins(i);
             energy += IsingEnergy(i);
-        }
+		}
+		// ahc_solver_energy:for(int i=0; i<N; i++){
+		// 	#pragma HLS pipeline
+        //     // setSpins(i);
+        // }
+
         // find bestEnergy for all iteration
 		if(energy < this->bestEnergy){
-			bestEnergy = energy;
-			#pragma HLS pipeline off
+			this->bestEnergy = energy;
 			ahc_solver_best_energy:for(int k = 0; k < N; k++){
-				#pragma HLS unroll factor=8
-				bestSpins[k] = this->lastSpins[k];
+				#pragma HLS pipeline
+				this->bestSpins[k] = this->lastSpins[k];
 			}
 		}
 	}
@@ -110,7 +117,8 @@ void AHC::update(int i){
 
 	// this->x[i] += -dt * this->x[i] * ((data_type_x(0.02)) + mu*this->xx[i]);
 	data_type_x this_x_tmp_2;
-	this_x_tmp_2 = (data_type_x(0.02)) + mu*this->xx[i];
+	// this_x_tmp_2 = (data_type_x(0.02)) + mu*this->xx[i];
+	this_x_tmp_2 = (data_type_x(0.02)) + this->xx[i];
 	this->x[i] += -((this_x_tmp_2 >> 7) + (this_x_tmp_2 >> 9)) * this->x[i];
 
 	// this->de[i] = dt*(-beta * this->e[i] * (this->xx[i] - target_a));
@@ -179,15 +187,18 @@ void ahc_top(
 	// Partition the first dim
 	// #pragma HLS ARRAY_PARTITION variable=J_matrix dim=1 complete
 	// #pragma HLS ARRAY_PARTITION variable=x_init dim=1 complete
+
 	#pragma HLS INTERFACE bram port=J_matrix
 	#pragma HLS INTERFACE bram port=x_init
 	#pragma HLS INTERFACE bram port=bestSpinsOut
+
 	static AHC ahc_instance(x_init, J_matrix);
 	ahc_instance.ahc_solver();
 
 	#pragma HLS pipeline off
     top_chann:for (int i = 0; i < N; i++) {
 		// #pragma HLS pipeline 
+		#pragma HLS unroll factor=8
         bestSpinsOut[i] = ahc_instance.bestSpins[i];
     }
 }

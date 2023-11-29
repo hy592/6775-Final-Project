@@ -2,6 +2,7 @@
 #include "hls_half.h"
 
 #define N 64
+#define num_time_step 200
 #define MAX_WIDTH 16
 #define intBits 2
 
@@ -18,16 +19,16 @@ typedef ap_int<2> spin_sign;
 
 class AHC{
     public:
-	ap_fixed<MAX_WIDTH, 2> dt;
-	ap_fixed<MAX_WIDTH, 2> r;
-	ap_fixed<MAX_WIDTH, 2> beta;
-	ap_fixed<MAX_WIDTH, 2> coupling_strength;
+	// ap_fixed<MAX_WIDTH, 2> dt;
+	// ap_fixed<MAX_WIDTH, 2> r;
+	// ap_fixed<MAX_WIDTH, 2> beta;
+	// ap_fixed<MAX_WIDTH, 2> coupling_strength;
 
-    ap_fixed<MAX_WIDTH, 3> mu;
-    ap_fixed<MAX_WIDTH, 2> target_a_baseline;
+    // ap_fixed<MAX_WIDTH, 3> mu;
+    // ap_fixed<MAX_WIDTH, 2> target_a_baseline;
     ap_fixed<MAX_WIDTH, 2> target_a;
 
-    int num_time_steps;
+    // int num_time_steps;
 
     data_type_J J[N][N];
     data_type_x x[N];
