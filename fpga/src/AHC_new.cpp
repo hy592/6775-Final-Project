@@ -19,8 +19,9 @@ AHC::AHC(data_type_x x_init[N], data_type_J J_init[N][N]){
 	target_a = target_a_baseline;
 
 	// Initialize the spins, J matrix and MVM output
+	#pragma HLS pipeline off
 	Initialize:for(int i=0;i<N;i++){
-		#pragma HLS pipeline 
+		// #pragma HLS pipeline 
 		e[i] = 1.0;
 		this->x[i] = x_init[i];
 		MVM_out[i] = 0.0;
@@ -28,7 +29,8 @@ AHC::AHC(data_type_x x_init[N], data_type_J J_init[N][N]){
 	}
 
 	Initialize_J:for(int j=0;j<N;j++){
-		#pragma HLS pipeline 
+		// #pragma HLS pipeline 
+		#pragma HLS pipeline off
 		Initialize_J_inn:for(int i=0;i<N;i++){
 		#pragma HLS unroll factor=8
             this->J[i][j] = J_init[i][j];
@@ -42,15 +44,17 @@ void AHC::ahc_solver(){
 	#pragma HLS ARRAY_PARTITION variable=dx2 dim=0 complete
 	#pragma HLS ARRAY_PARTITION variable=de dim=0 complete
 
+	#pragma HLS pipeline off
 	Initialize_ahc_solver:for(int i=0; i<N; i++){
-		#pragma HLS pipeline 
+		// #pragma HLS pipeline 
 		setSpins(i);	// initialize vectors
 		matmul(i);
 	}
 
 	ahc_solver_time_step:for(int time_step=0; time_step < this->num_time_steps; time_step++){
-		#pragma HLS pipeline 
+		// #pragma HLS pipeline 
 		#pragma HLS latency min=4 max=5
+		#pragma HLS pipeline off
 		data_type_e energy = 0.0;
 		ahc_solver_chan1:for(int i=0; i<N; i++){
 			#pragma HLS unroll factor=8
@@ -67,6 +71,7 @@ void AHC::ahc_solver(){
         // find bestEnergy for all iteration
 		if(energy < this->bestEnergy){
 			bestEnergy = energy;
+			#pragma HLS pipeline off
 			ahc_solver_energy:for(int k = 0; k < N; k++){
 				#pragma HLS unroll factor=8
 				bestSpins[k] = this->lastSpins[k];
@@ -178,8 +183,9 @@ void ahc_top(
 	static AHC ahc_instance(x_init, J_matrix);
 	ahc_instance.ahc_solver();
 
+	#pragma HLS pipeline off
     top_chann:for (int i = 0; i < N; i++) {
-		#pragma HLS pipeline 
+		// #pragma HLS pipeline 
         bestSpinsOut[i] = ahc_instance.bestSpins[i];
     }
 }
