@@ -6,7 +6,7 @@
 #include "AHC_low.h"
 #include "ap_fixed.h"
 
-#define USER "nb498"
+#define USER "nb498/ece6775"
 #define PROJECT_DIR_NAME "final_project"
 #define DIR "/home/" USER "/" PROJECT_DIR_NAME "/sample_MIMO"
 #define JMATRICES DIR "/J_matrix_16_nr16_16QAM_snr_30" 
@@ -144,7 +144,7 @@ int main()
   // ifstream input_file("DI_MIMO_J_Conv_Fixed_Mult0.txt");
   for ( int k = startNum; k < startNum + numProblems; k++ ) {
     ifstream input_file1( JMATRICES + (string)"/DI_MIMO_J_QUAD_" + std::to_string( k ) + (string)".txt" );
-
+    std::cout << JMATRICES + (string)"/DI_MIMO_J_QUAD_" + std::to_string( k ) + (string)".txt" << std::endl;
     if ( !input_file1.is_open() ) {
       cout << "Error opening file!" << endl;
       return 1;
