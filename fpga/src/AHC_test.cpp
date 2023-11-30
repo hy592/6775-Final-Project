@@ -9,7 +9,7 @@
 #define USER "nb498/ece6775"
 #define PROJECT_DIR_NAME "final_project"
 #define DIR "/home/" USER "/" PROJECT_DIR_NAME "/sample_MIMO"
-#define JMATRICES DIR "/J_matrix_16_nr16_16QAM_snr_30" 
+#define JMATRICES "/home/" USER "/" PROJECT_DIR_NAME "/fixed_pt_data" 
 #define IDEALS DIR "/ideal_sols_16_nr16_16QAM" 
 
 using namespace std;
@@ -143,12 +143,12 @@ int main()
 
   // ifstream input_file("DI_MIMO_J_Conv_Fixed_Mult0.txt");
   for ( int k = startNum; k < startNum + numProblems; k++ ) {
-    ifstream input_file1( JMATRICES + (string)"/DI_MIMO_J_QUAD_" + std::to_string( k ) + (string)".txt" );
-    std::cout << JMATRICES + (string)"/DI_MIMO_J_QUAD_" + std::to_string( k ) + (string)".txt" << std::endl;
-    if ( !input_file1.is_open() ) {
+    ifstream input_file1( JMATRICES + (string)"/DI_MIMO_J_Conv_11_29_16_2_" + std::to_string( k ) + (string)".txt" );
+    std::cout << JMATRICES + (string)"/DI_MIMO_J_Conv_11_29_16_2_" + std::to_string( k ) + (string)".txt" << std::endl;
+    /* if ( !input_file1.is_open() ) {
       cout << "Error opening file!" << endl;
       return 1;
-    }
+    } */
 
 #ifdef DEBUG
     cout << "INIT SPINS" << endl;
@@ -169,12 +169,14 @@ int main()
       for ( int j = 0; j < matrix_size; j++ ) {
         int hex_value;
         input_file1 >> hex >> hex_value;
+        std::cout << hex_value << ' ';
         // cout << "HEX val" << hex_value << endl;
         // matrix[i][j] = static_cast<float>(hex_value) / 1048576.0f;
         // matrix[i][j] = static_cast<float>(hex_value) / 262144.0f; //18_2
         // matrix[i][j] = static_cast<float>(hex_value) / 8388608.0f; //23_2
 
         matrix[i][j] = static_cast<float>( hex_value ) / 4096.0f;  // 12_2
+        // std::cout << matrix[i][j] << ' ';
 
         // matrix[i][j] = static_cast<float>(hex_value) / 4096.0f;
 
@@ -182,6 +184,7 @@ int main()
         //   cout << matrix[i][j] << "  ";
         // #endif
       }
+      std::cout << std::endl;
 
       // #ifdef DEBUG
       //	cout << std::endl;
