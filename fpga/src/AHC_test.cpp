@@ -16,7 +16,7 @@ using namespace std;
 
 const int matrix_size = 65;
 
-void top_func_test( data_type_J J[matrix_size][matrix_size], data_type_x init_spins[100][matrix_size], int problemNum )
+void top_func_test( data_type_J J[N][N], data_type_x init_spins[100][N], int problemNum )
 {
   AHC solver( init_spins[0], J );
   solver.ahc_solver();

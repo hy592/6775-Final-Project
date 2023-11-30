@@ -43,11 +43,11 @@ bitstream: xillydemo.bit
 	@echo "Bitstream saved to $<"
 
 test: AHC_test
-	g++ ${CFLAGS} -o AHC_test AHC_test.cpp
+	g++ ${CFLAGS} -o AHC_test AHC_test.cpp AHC_low.cpp
 	./AHC_test
 
 AHC_test: AHC_test.cpp
-	g++ ${CFLAGS} -o AHC_test AHC_test.cpp
+	g++ ${CFLAGS} -o AHC_test AHC_test.cpp AHC_low.cpp
 
 
 clean:
