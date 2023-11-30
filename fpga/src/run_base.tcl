@@ -14,7 +14,7 @@ set_top ahc_top
 
 # Add design and testbench files
 # add_files AHC_low.cpp -cflags "-std=c++11"
-add_files AHC_new.cpp -cflags "-std=c++11"
+add_files AHC_low.cpp -cflags "-std=c++11"
 
 # Add testbench files
 add_files -tb AHC_test_simple.cpp -cflags "-std=c++11"

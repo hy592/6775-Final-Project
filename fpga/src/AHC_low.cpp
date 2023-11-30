@@ -20,10 +20,10 @@ float x2_debug[150][65];
 
 AHC::AHC(data_type_x x_init[N], data_type_J J_init[N][N]){
 // Partition local variables to improve bandwidth
-#pragma HLS ARRAY_PARTITION variable=this->J dim=1 factor=8
-#pragma HLS ARRAY_PARTITION variable=this->x dim=1 factor=8
-#pragma HLS ARRAY_PARTITION variable=this->MVM_out dim=1 factor=8
-#pragma HLS ARRAY_PARTITION variable=this->e dim=1 factor=8
+#pragma HLS ARRAY_PARTITION variable=this->J complete
+#pragma HLS ARRAY_PARTITION variable=this->x complete
+#pragma HLS ARRAY_PARTITION variable=this->MVM_out complete
+#pragma HLS ARRAY_PARTITION variable=this->e complete
 
 	// Initialize the AHC solver
 	dt   = 0.01;
@@ -38,7 +38,6 @@ AHC::AHC(data_type_x x_init[N], data_type_J J_init[N][N]){
 	// Initialize the spins, J matrix and MVM output
 	initialize_vectors:
 	for(int i=0;i<N;i++){
-	#pragma HLS UNROLL FACTOR=8
 		e[i] = 1.0;
 		this->x[i] = x_init[i];
 		MVM_out[i] = 0.0;
@@ -49,7 +48,6 @@ AHC::AHC(data_type_x x_init[N], data_type_J J_init[N][N]){
 	for(int j=0;j<N;j++){
 	#pragma HLS PIPELINE
 		for(int i=0;i<N;i++){
-		#pragma HLS UNROLL FACTOR=8
             this->J[i][j] = J_init[i][j];
         }
     }
@@ -64,25 +62,14 @@ data_type_x square_single(data_type_x val) {
 	return(tmp_xx);
 }
 
-// Squares the input vector
-void AHC::square(){
-	#pragma HLS INLINE off
-	#pragma HLS PIPELINE
-	// Element wise square
-	square_loop:for(int i=0;i<N;i++){
-		#pragma HLS UNROLL FACTOR=8
-		this->xx[i]= square_single(this->x[i]);
-	}
-}
-
 // setSpins
 // This function update the lastSpins based on the current spin values
 // This is used to determine the sign of the spins in the MVM
 void AHC::setSpins(){
+	#pragma HLS INLINE
 	#pragma HLS PIPELINE
 	setSpins_loop:
 	for(int i =0; i < N; i++){
-	#pragma HLS UNROLL FACTOR=8
 		if(this->x[i] > 0){
 			this->lastSpins[i] = 1;
 		}
@@ -98,15 +85,13 @@ void AHC::setSpins(){
 // Matrix vector product
 void AHC::matmul()
 {
-	#pragma HLS INLINE off
-	#pragma HLS PIPELINE
-	#pragma HLS LATENCY min=4 max=5
+	#pragma HLS INLINE
+	// #pragma HLS PIPELINE
 	// Matrix vector product
 	// MVM = (J).dot(np.sign(x))
 	MVM_outer:for(int i=0;i<N;i++){
 		this->MVM_out[i]=0.0;
 		MVM_inner:for(int j=0;j<N;j++){
-		#pragma HLS UNROLL FACTOR=8
 			if(this->x[j]==1){
 				this->MVM_out[i] += this->J[i][j];
 			}
@@ -127,7 +112,6 @@ data_type_e AHC::IsingEnergy(){
 	#pragma HLS PIPELINE
 	data_type_e energy = 0.0;
 	IsingEnergy_loop: for(int i = 0; i < N; i++){
-		#pragma HLS UNROLL factor=8
 		data_type_e temp;
 		if(this->lastSpins[i]==1){
 			temp = -((this->MVM_out[i]) >> 1);
@@ -142,13 +126,12 @@ data_type_e AHC::IsingEnergy(){
 
 // Update the spins and error vectors
 void AHC::update(){
-	#pragma HLS INLINE off
+	#pragma HLS INLINE
 	#pragma HLS PIPELINE
 	// #pragma HLS LATENCY min=4 max=10
 
 	update_spin_and_error:
 	for(int i=0;i<N;i++){
-		#pragma HLS UNROLL factor=8
 		// dt   = (1 >> 7) + (1 >> 9); // 0.01
 		// r    = 1 - (1 >> 6) - (1 >> 8); // 0.98
 		// beta = (1 >> 4) + (1 >> 5) + (1 >> 7); // 0.1
@@ -191,7 +174,6 @@ void AHC::reset(){
 	#pragma HLS PIPELINE
 	// Reset MVM
 	reset_MVM:for(int i=0;i<N;i++){
-	#pragma HLS UNROLL factor=8
 		this->MVM_out[i] = 0.0;
 	}
 }
@@ -219,8 +201,8 @@ void AHC::ahc_solver(){
 	setSpins();	// initialize vectors
 	matmul();
 
-	iterations:
-	for(int time_step=0; time_step < this->num_time_steps; time_step++){
+	TIME_STEP_LOOP:
+	for(int time_step=0; time_step < 200; time_step++){
 		update();
 		setSpins();
 		matmul();
