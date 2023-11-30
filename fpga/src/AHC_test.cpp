@@ -3,7 +3,7 @@
 #include <iostream>
 #include <random>
 
-#include "AHC_new.h"
+#include "AHC_low.h"
 #include "ap_fixed.h"
 
 #define USER "nb498/ece6775"
@@ -21,7 +21,7 @@ void top_func_test( data_type_J J[N][N], data_type_x init_spins[100][N], int pro
   AHC solver( init_spins[0], J );
   solver.ahc_solver();
   for ( int i = 0; i < 100; i++ ) {
-    solver.updateSpins( init_spins[i] );
+    solver.updateSpins( init_spins[i], 0.02,1.3 );
     solver.ahc_solver();
   }
 
@@ -47,14 +47,6 @@ int main()
   data_type_x x_init_arrays[100][matrix_size];
 
   data_type_J matrix[matrix_size][matrix_size];
-  data_type_J zed = 0.0;
-  if ( zed > 0 ) {
-    cout << "ZERO IS bigger than zpointz" << endl;
-  }
-  else if ( zed < 0.0 )
-    cout << "zed less zpointz" << endl;
-  else
-    cout << "SIGN BIT ISSUE" << endl;
 
   // Seed the random number generator
   srand( 1234 );
