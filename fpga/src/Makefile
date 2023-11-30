@@ -13,7 +13,7 @@ XILINX_VIVADO?=/opt/xilinx/Xilinx_Vivado_vitis_2019.2/Vivado/2019.2
 XIL_HLS=source $(XILINX_VIVADO)/settings64.sh; vivado_hls
 VHLS_INC=$(XILINX_VIVADO)/include
 # Specify compilation flags
-CFLAGS=-g -I${VHLS_INC} -DHLS_NO_XIL_FPO_LIB -std=c++11 
+CFLAGS=-g -I${VHLS_INC} -DHLS_NO_XIL_FPO_LIB -std=c++11 -D VERSION=low
 
 TCL_SCRIPT=run_pipeline.tcl
 
@@ -41,6 +41,14 @@ xillydemo.bit:
 
 bitstream: xillydemo.bit
 	@echo "Bitstream saved to $<"
+
+test: AHC_test
+	g++ ${CFLAGS} -o AHC_test AHC_test.cpp AHC_low.cpp
+	./AHC_test > test_output_low.txt
+
+AHC_test: AHC_test.cpp
+	g++ ${CFLAGS} -o AHC_test AHC_test.cpp AHC_low.cpp
+
 
 clean:
 	rm -rf digitrec *.dat *.prj *.log

@@ -162,4 +162,26 @@ void dut (
   strm_out.write( s(31, 0) );
   strm_out.write( s(s.length()-1, 32) );
 }
+
+```
+
+##
+
+## Testbench
+
+To run the testbench, run ```make test``` in ```fpga/src/```. Currently, we have two implementations: ```AHC_low``` and ```AHC_new```. Modify 
+- ```make test``` in ```fpga/src/Makefile```'s
+- ```#include```s in ```fpga/src/AHC_test.cpp```'s
+
+to change versions.
+
+### Makefile
+
+```cmake
+test: AHC_test
+	g++ ${CFLAGS} -o AHC_test AHC_test.cpp AHC_<low OR new>.cpp
+	./AHC_test > test_output_<low OR new>.txt
+
+AHC_test: AHC_test.cpp
+	g++ ${CFLAGS} -o AHC_test AHC_test.cpp AHC_<low OR new>.cpp  
 ```
