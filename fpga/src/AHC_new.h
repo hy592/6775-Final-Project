@@ -53,7 +53,7 @@ class AHC{
     void reset(int i);
     data_type_e IsingEnergy(int i);
 
-    void AHC::updateSpins(data_type_x x_init[N]);
+    void updateSpins(data_type_x x_init[N]);
 };
 
 void ahc_top(
