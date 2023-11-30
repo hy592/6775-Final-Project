@@ -1,7 +1,7 @@
 #include "ap_fixed.h"
 #include "hls_half.h"
 
-#define N 64
+#define N 65
 #define num_time_step 200
 #define MAX_WIDTH 16
 #define intBits 2
