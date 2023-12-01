@@ -20,8 +20,8 @@ float x2_debug[150][65];
 
 AHC::AHC(data_type_x x_init[N], data_type_J J_init[N][N]){
 // Partition local variables to improve bandwidth
-#pragma HLS ARRAY_PARTITION variable=this->J complete
-#pragma HLS ARRAY_PARTITION variable=this->x complete
+// #pragma HLS ARRAY_PARTITION variable=J complete dim=0
+// #pragma HLS ARRAY_PARTITION variable=x complete
 #pragma HLS ARRAY_PARTITION variable=this->MVM_out complete
 #pragma HLS ARRAY_PARTITION variable=this->e complete
 
@@ -57,7 +57,7 @@ AHC::AHC(data_type_x x_init[N], data_type_J J_init[N][N]){
 data_type_x square_single(data_type_x val) {
 	data_type_x tmp_xx;
 	// use LUT to perform mul, instead of using DSP
-	#pragma HLS BIND_OP variable=tmp_xx op=mul impl=fabric
+	// #pragma HLS BIND_OP variable=tmp_xx op=mul impl=fabric
 	tmp_xx = val * val;
 	return(tmp_xx);
 }
@@ -82,15 +82,24 @@ void AHC::setSpins(){
 	}
 }
 
-// Matrix vector product
-void AHC::matmul()
-{
-	#pragma HLS INLINE
+void matmul_inner(data_type_J J[N][N], data_type_x x[N], data_type_x MVM_out[N]) {
+	// #pragma HLS INLINE
 	// Matrix vector product
 	// MVM = (J).dot(np.sign(x))
+	data_type_J J_tmp[N][N];
+	#pragma HLS ARRAY_PARTITION variable=J_tmp complete dim=2
+	#pragma HLS ARRAY_PARTITION variable=J complete dim=2
+	#pragma HLS ARRAY_PARTITION variable=x complete
+	for(int i = 0; i < N; ++i) {
+		#pragma HLS pipeline
+		for (int j = 0; j < N; ++j) {
+			J_tmp[i][j] = J[i][j];
+		}
+	}
+
 	for (int i = 0; i < N; ++i) {
 		#pragma HLS PIPELINE
-		this->MVM_out[i] = 0.0;
+		MVM_out[i] = 0.0;
 	}
 	MVM_outer:
 	for(int i = 0; i < N; i++){
@@ -98,11 +107,11 @@ void AHC::matmul()
 		data_type_x tmp = 0.0;
 		MVM_inner:
 		for(int j = 0; j < N; j++){
-			if(this->x[j] == 1){
-				tmp += this->J[i][j];
+			if(x[j] == 1){
+				tmp += J_tmp[i][j];
 			}
-			else if(this->x[j] == -1){
-				tmp -= (this->J[i][j]);
+			else if(x[j] == -1){
+				tmp -= (J_tmp[i][j]);
 				//this->lastSpins[i] = -1;
 			}
 			else{
@@ -110,9 +119,44 @@ void AHC::matmul()
 				// this->lastSpins[i] = 0;
 			}
 		}
-		this->MVM_out[i] += tmp;
+		MVM_out[i] += tmp;
 	}
 }
+
+// Matrix vector product
+void AHC::matmul()
+{
+	// #pragma HLS INLINE
+	// // Matrix vector product
+	// // MVM = (J).dot(np.sign(x))
+	// for (int i = 0; i < N; ++i) {
+	// 	#pragma HLS PIPELINE
+	// 	this->MVM_out[i] = 0.0;
+	// }
+	// MVM_outer:
+	// for(int i = 0; i < N; i++){
+	// 	#pragma HLS PIPELINE
+	// 	data_type_x tmp = 0.0;
+	// 	MVM_inner:
+	// 	for(int j = 0; j < N; j++){
+	// 		if(this->x[j] == 1){
+	// 			tmp += this->J[i][j];
+	// 		}
+	// 		else if(this->x[j] == -1){
+	// 			tmp -= (this->J[i][j]);
+	// 			//this->lastSpins[i] = -1;
+	// 		}
+	// 		else{
+	// 			tmp += 0;
+	// 			// this->lastSpins[i] = 0;
+	// 		}
+	// 	}
+	// 	this->MVM_out[i] += tmp;
+	// }
+	matmul_inner(this->J, this->x, this->MVM_out);
+}
+
+
 
 // Calculates the Ising energy
 data_type_e AHC::IsingEnergy(){
@@ -243,3 +287,5 @@ void ahc_top(
         bestSpinsOut[i] = ahc_instance.bestSpins[i];
     }
 }
+
+// add a new dut function
