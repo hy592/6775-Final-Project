@@ -31,62 +31,32 @@ class AHC{
 
     data_type_J J[N][N];
     data_type_x x[N];
-    data_type_x MVM_out[N];
+    data_type_x MVM[N];
     data_type_e e[N];
-
-    data_type_x xx[N], dx[N], dx2[N];
-
-	data_type_e de[N];
-
-    /*
-    float dt;
-    float r;
-    float beta;
-    float coupling_strength;
-
-    float mu;
-    float target_a_baseline;
-    float  target_a;
-    //int num_time_steps;
-
-    float J[N][N];
-    float x[N];
-    float MVM_out[N];
-    float e[N];
-
-    float xx[N], dx[N], dx2[N];
-
-    float de[N];
-
-    //float bestEnergy = 100;
-    //float bestSpins[N];
-    */
 
 	data_type_e bestEnergy = 10;
 	spin_sign bestSpins[N];
-	spin_sign lastSpins[N];
 
-    AHC(data_type_x x_init[N], data_type_J J_init[N][N]);
+    AHC(data_type_J J_init[N][N]);
 
-    void ahc_solver();
-    void square();
-    void matmul();
-    void update();
-    void setSpins();
-    void reset();
+    void ahc_solver(data_type_x x_init[N]);
+    // void square();
+    void update(data_type_x x_old[N], data_type_x MVM_in[N], data_type_x x_new[N]);
+    void matmul(data_type_x x_in[N], data_type_x MVM_new[N]);
+    void setSpins(data_type_x x_in[N], spin_sign lastSpins_out[N]);
+    void IsingEnergy(data_type_x MVM_in[N], spin_sign lastSpins_in[N]);
 
-    void writeDebug(int index);
-    void updateSpins(
-        data_type_x x_init[N], 
-        ap_fixed<MAX_WIDTH, 2> coupling_strength_new, 
-        ap_fixed<MAX_WIDTH,2> new_mu
-    );
-
-    data_type_e IsingEnergy();
+    // void reset();
+    // void writeDebug(int index);
+    // void updateSpins(
+    //     data_type_x x_init[N], 
+    //     ap_fixed<MAX_WIDTH, 2> coupling_strength_new, 
+    //     ap_fixed<MAX_WIDTH,2> new_mu
+    // );
 };
 
 void ahc_top(
     data_type_J J_matrix[N][N], 
     data_type_x x_init[N], 
     spin_sign bestSpinsOut[N]
-    );
+);

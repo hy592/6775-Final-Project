@@ -22,14 +22,13 @@ const int matrix_size = N; // Size of the matrix, N
 */
 void top_func_test(data_type_J J[N][N], data_type_x init_spins[100][N], int problemNum)
 {
-  AHC solver(init_spins[0], J);
-  solver.ahc_solver();
-  for (int i = 0; i < 100; i++)
+  AHC solver(J);
+  for (int i = 0; i < 10; i++)
   {
     // initialize the temperature and the annealing rate
-    if (i < 100) {
-      solver.updateSpins(init_spins[i], 0.02, 1.3);
-    }
+    // if (i < 100) {
+    //   solver.updateSpins(init_spins[i], 0.02, 1.3);
+    // }
     /*
     else if(i < 60){
       solver.updateSpins(init_spins[i], 0.02,1.2);
@@ -43,7 +42,7 @@ void top_func_test(data_type_J J[N][N], data_type_x init_spins[100][N], int prob
     */
 
     // run the AHC solver
-    solver.ahc_solver();
+    solver.ahc_solver(init_spins[i]);
   }
   // output filestream object
   std::ofstream outSpins; 
