@@ -33,3 +33,7 @@
 
 test_output.txt
 .vscode
+
+fpga/src/zedboard_project
+fpga/src/test_output_low.txt
+fpga/src/zedboard_project.tgz

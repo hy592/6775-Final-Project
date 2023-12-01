@@ -67,9 +67,9 @@ data_type_x square_single(data_type_x val) {
 // This is used to determine the sign of the spins in the MVM
 void AHC::setSpins(){
 	#pragma HLS INLINE
-	#pragma HLS PIPELINE
 	setSpins_loop:
 	for(int i =0; i < N; i++){
+		#pragma HLS PIPELINE
 		if(this->x[i] > 0){
 			this->lastSpins[i] = 1;
 		}
@@ -88,36 +88,38 @@ void AHC::matmul()
 	#pragma HLS INLINE
 	// Matrix vector product
 	// MVM = (J).dot(np.sign(x))
-	#pragma HLS PIPELINE
 	for (int i = 0; i < N; ++i) {
+		#pragma HLS PIPELINE
 		this->MVM_out[i] = 0.0;
 	}
-	#pragma HLS PIPELINE
 	MVM_outer:
 	for(int i = 0; i < N; i++){
-		#pragma HLS UNROLL
+		#pragma HLS PIPELINE
+		data_type_x tmp = 0.0;
 		MVM_inner:
 		for(int j = 0; j < N; j++){
 			if(this->x[j] == 1){
-				this->MVM_out[i] += this->J[i][j];
+				tmp += this->J[i][j];
 			}
 			else if(this->x[j] == -1){
-				this->MVM_out[i] -= (this->J[i][j]);
+				tmp -= (this->J[i][j]);
 				//this->lastSpins[i] = -1;
 			}
 			else{
-				this->MVM_out[i] += 0;
+				tmp += 0;
 				// this->lastSpins[i] = 0;
 			}
 		}
+		this->MVM_out[i] += tmp;
 	}
 }
 
 // Calculates the Ising energy
 data_type_e AHC::IsingEnergy(){
-	#pragma HLS PIPELINE
 	data_type_e energy = 0.0;
-	IsingEnergy_loop: for(int i = 0; i < N; i++){
+	IsingEnergy_loop: 
+	for(int i = 0; i < N; i++){
+		#pragma HLS PIPELINE
 		data_type_e temp;
 		if(this->lastSpins[i]==1){
 			temp = -((this->MVM_out[i]) >> 1);
@@ -133,11 +135,11 @@ data_type_e AHC::IsingEnergy(){
 // Update the spins and error vectors
 void AHC::update(){
 	#pragma HLS INLINE
-	#pragma HLS PIPELINE
 	// #pragma HLS LATENCY min=4 max=10
 
 	update_spin_and_error:
 	for(int i=0;i<N;i++){
+		#pragma HLS PIPELINE
 		// dt   = (1 >> 7) + (1 >> 9); // 0.01
 		// r    = 1 - (1 >> 6) - (1 >> 8); // 0.98
 		// beta = (1 >> 4) + (1 >> 5) + (1 >> 7); // 0.1
@@ -177,9 +179,10 @@ void AHC::update(){
 
 void AHC::reset(){
 	#pragma HLS INLINE off
-	#pragma HLS PIPELINE
 	// Reset MVM
-	reset_MVM:for(int i=0;i<N;i++){
+	reset_MVM:
+	for(int i = 0; i < N; i++){
+		#pragma HLS PIPELINE
 		this->MVM_out[i] = 0.0;
 	}
 }
