@@ -86,16 +86,22 @@ void AHC::setSpins(){
 void AHC::matmul()
 {
 	#pragma HLS INLINE
-	// #pragma HLS PIPELINE
 	// Matrix vector product
 	// MVM = (J).dot(np.sign(x))
-	MVM_outer:for(int i=0;i<N;i++){
-		this->MVM_out[i]=0.0;
-		MVM_inner:for(int j=0;j<N;j++){
-			if(this->x[j]==1){
+	#pragma HLS PIPELINE
+	for (int i = 0; i < N; ++i) {
+		this->MVM_out[i] = 0.0;
+	}
+	#pragma HLS PIPELINE
+	MVM_outer:
+	for(int i = 0; i < N; i++){
+		#pragma HLS UNROLL
+		MVM_inner:
+		for(int j = 0; j < N; j++){
+			if(this->x[j] == 1){
 				this->MVM_out[i] += this->J[i][j];
 			}
-			else if(this->x[j]==-1){
+			else if(this->x[j] == -1){
 				this->MVM_out[i] -= (this->J[i][j]);
 				//this->lastSpins[i] = -1;
 			}
