@@ -18,20 +18,25 @@ const int matrix_size = 65;
 
 void top_func_test( data_type_J J[N][N], data_type_x init_spins[100][N], int problemNum )
 {
-  AHC solver( init_spins[0], J );
-  solver.ahc_solver();
+  spin_sign bestSpins[N];
+  data_type_e bestEnergy;
+
+  AHC ahc_instance;  // AHC instance
+  ahc_instance.updateJ(J);    // load problem set
+  // ahc_instance.ahc_solver();
   for ( int i = 0; i < 100; i++ ) {
-    solver.updateSpins( init_spins[i], 0.02,1.3 );
-    solver.ahc_solver();
+    // ahc_instance.updateSpins( init_spins[i], 0.02,1.3 );
+    ahc_instance.ahc_solver(init_spins[i]);
   }
 
+  bestEnergy = ahc_instance.bestEnergySpins(bestSpins);
   // spin_sign spin_guesses[N];
 
-  std::cout << "BEST ENERGY" << solver.bestEnergy << endl;
+  std::cout << "BEST ENERGY = " << bestEnergy << endl;
 
   for (int i = 0; i < N; ++i)
   {
-    std::cout << solver.bestSpins[i] << std::endl;
+    std::cout << bestSpins[i] << std::endl;
   }
 
   /* ifstream ideal_solutions(IDEALS + "/DI_MIMO_mmse_sol_" + std::to_string(problemNum) + ".txt");

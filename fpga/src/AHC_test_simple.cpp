@@ -31,9 +31,14 @@ int main(){
 		bestSpinsOut[i] = 0;
 	}
 
+	data_type_e bestEnergy = 10;
+
 	// ahc_top(J_matrix, x_init, bestSpinsOut);
-	static AHC ahc_instance(J_matrix);
-	ahc_instance.ahc_solver(x_init, bestSpinsOut);
+	static AHC ahc_instance;
+	ahc_instance.updateJ(J_matrix);
+	ahc_instance.ahc_solver(x_init);
+	
+	bestEnergy = ahc_instance.bestEnergySpins(bestSpinsOut);
 	
 	// print ahc_instance_bestSpins
 	for (int i = 0; i < N; i++)

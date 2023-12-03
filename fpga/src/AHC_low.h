@@ -22,9 +22,12 @@ typedef ap_int<2> spin_sign;
 
 class AHC{
     public:	
-        AHC(data_type_J J_init[N][N]);
+        AHC();
 
-        void ahc_solver(data_type_x x_init[N], spin_sign bestSpins[N]);
+        data_type_e bestEnergySpins(spin_sign bestSpins[N]);
+
+        void ahc_solver(data_type_x x_init[N]);
+
         void matmul();
         void update();
         void setSpins();
@@ -33,11 +36,12 @@ class AHC{
         void reset();
 
         void writeDebug(int index);
-        void updateSpins(
-            data_type_x x_init[N], 
-            ap_fixed<MAX_WIDTH, 2> coupling_strength_new, 
-            ap_fixed<MAX_WIDTH,2> new_mu
+        void updateX(
+            data_type_x x_init[N]
+            // ap_fixed<MAX_WIDTH, 2> coupling_strength_new, 
+            // ap_fixed<MAX_WIDTH,2> new_mu
         );
+        void updateJ(data_type_J J_init[N][N]);
 
     private:
         ap_fixed<MAX_WIDTH, 2> dt;

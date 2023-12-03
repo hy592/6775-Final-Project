@@ -18,7 +18,7 @@ float x2_debug[150][65];
 //using std::cout;
 //using std::endl;
 
-AHC::AHC(data_type_J J_init[N][N]){
+AHC::AHC(){
 // Partition local variables to improve bandwidth
 #pragma HLS ARRAY_PARTITION variable=this->J complete dim=1
 #pragma HLS ARRAY_PARTITION variable=this->x complete
@@ -26,29 +26,29 @@ AHC::AHC(data_type_J J_init[N][N]){
 #pragma HLS ARRAY_PARTITION variable=this->e complete
 
 	// Initialize the AHC solver
-	// this->dt   = 0.01;
-	// this->r    = 0.98;
-	// this->beta = 0.1;
-	// this->coupling_strength = 0.020;
-	// this->mu = 1.0;
-	// this->num_time_steps = 200;
+	this->dt   = 0.01;
+	this->r    = 0.98;
+	this->beta = 0.1;
+	this->coupling_strength = 0.020;
+	this->mu = 1.0;
+	this->num_time_steps = 200;
 	this->target_a_baseline = 0.2;
 	this->target_a = target_a_baseline;
 
 	// Initialize the spins, J matrix and MVM output
-	initialize_vectors:
-	for(int i=0;i<N;i++){
-		this->e[i] = 1.0;
-		// this->x[i] = x_init[i];
-	}
+	// initialize_vectors:
+	// for(int i=0;i<N;i++){
+	// 	this->e[i] = 1.0;
+	// 	// this->x[i] = x_init[i];
+	// }
 
-    initialize_matrix:
-	for(int j=0;j<N;j++){
-	#pragma HLS PIPELINE
-		for(int i=0;i<N;i++){
-            this->J[i][j] = J_init[i][j];
-        }
-    }
+    // initialize_matrix:
+	// for(int j=0;j<N;j++){
+	// #pragma HLS PIPELINE
+	// 	for(int i=0;i<N;i++){
+    //         this->J[i][j] = J_init[i][j];
+    //     }
+    // }
 }
 
 // setSpins
@@ -93,60 +93,60 @@ void AHC::matmul()
 	#pragma HLS INLINE off
 	// Matrix vector product
 	// MVM = (J).dot(np.sign(x))
-	for (int i = 0; i < N; ++i) {
+	for (int row = 0; row < N; row++) {
 		#pragma HLS PIPELINE
-		this->MVM_out[i] = 0.0;
+		this->MVM_out[row] = 0.0;
 	}
 	MVM_outer:
-	for(int j = 0; j < N; j++){
+	for(int i = 0; i < N; i++){
+		// for each element in x
 		#pragma HLS PIPELINE
 		MVM_inner:
-		for(int i = 0; i < N; i++){
-			if(this->x[j] == 1){
-				this->MVM_out[i] += this->J[i][j];
+		for(int row = 0; row < N; row++){
+			// multiply with each element on i th column of J
+			if(this->x[i] == 1){
+				this->MVM_out[row] += this->J[row][i];
 			}
-			else if(this->x[j] == -1){
-				this->MVM_out[i] -= (this->J[i][j]);
-				//this->lastSpins[i] = -1;
+			else if(this->x[i] == -1){
+				this->MVM_out[row] -= this->J[row][i];
 			}
-			else{
-				this->MVM_out[i] += 0;
-				// this->lastSpins[i] = 0;
-			}
+			// else{
+			// 	this->MVM_out[row] += 0;
+			// }
 		}
-}
+	}
 }
 
 // Matrix vector product
 // void AHC::matmul()
 // {
-	// #pragma HLS INLINE
-	// // Matrix vector product
-	// // MVM = (J).dot(np.sign(x))
-	// for (int i = 0; i < N; ++i) {
-	// 	#pragma HLS PIPELINE
-	// 	this->MVM_out[i] = 0.0;
-	// }
-	// MVM_outer:
-	// for(int i = 0; i < N; i++){
-	// 	#pragma HLS PIPELINE
-	// 	data_type_x tmp = 0.0;
-	// 	MVM_inner:
-	// 	for(int j = 0; j < N; j++){
-	// 		if(this->x[j] == 1){
-	// 			tmp += this->J[i][j];
-	// 		}
-	// 		else if(this->x[j] == -1){
-	// 			tmp -= (this->J[i][j]);
-	// 			//this->lastSpins[i] = -1;
-	// 		}
-	// 		else{
-	// 			tmp += 0;
-	// 			// this->lastSpins[i] = 0;
-	// 		}
-	// 	}
-	// 	this->MVM_out[i] += tmp;
-	// }
+// 	#pragma HLS INLINE
+// 	// Matrix vector product
+// 	// MVM = (J).dot(np.sign(x))
+// 	for (int i = 0; i < N; ++i) {
+// 		#pragma HLS PIPELINE
+// 		this->MVM_out[i] = 0.0;
+// 	}
+// 	MVM_outer:
+// 	for(int i = 0; i < N; i++){
+// 		#pragma HLS PIPELINE
+// 		data_type_x tmp = 0.0;
+// 		MVM_inner:
+// 		for(int j = 0; j < N; j++){
+// 			if(this->x[j] == 1){
+// 				tmp += this->J[i][j];
+// 			}
+// 			else if(this->x[j] == -1){
+// 				tmp -= (this->J[i][j]);
+// 				//this->lastSpins[i] = -1;
+// 			}
+// 			else{
+// 				tmp += 0;
+// 				// this->lastSpins[i] = 0;
+// 			}
+// 		}
+// 		this->MVM_out[i] += tmp;
+// 	}
 // 	matmul_inner(this->J, this->x, this->MVM_out);
 // }
 
@@ -237,11 +237,13 @@ void AHC::reset(){
 	}
 }
 
-void AHC::updateSpins(data_type_x x_init[N], ap_fixed<MAX_WIDTH, 2> coupling_strength_new, ap_fixed<MAX_WIDTH,2> new_mu){
-	initialize_vectors:for(int i=0;i<N;i++){
+void AHC::updateX(
+	data_type_x x_init[N]
+	// ap_fixed<MAX_WIDTH, 2> coupling_strength_new, ap_fixed<MAX_WIDTH,2> new_mu
+){
+	initialize_vectors:for(int i=0; i<N; i++){
 		this->e[i] = 1.0;
 		this->x[i] = x_init[i];
-		this->MVM_out[i] = 0.0;
 		// this->lastSpins[i] = x_init[i];
 		// this->de[i] = 0;
 		// this->coupling_strength = coupling_strength_new;
@@ -249,14 +251,27 @@ void AHC::updateSpins(data_type_x x_init[N], ap_fixed<MAX_WIDTH, 2> coupling_str
 	}
 }
 
-void AHC::ahc_solver(
-	data_type_x x_init[N], 
-	spin_sign bestSpins[N]
-){
+void AHC::updateJ(data_type_J J_init[N][N]){
+	this->bestEnergy = 10;	// reset bestEnergy
+	
+	// reset bestSpins
 	for (int i=0; i<N; i++){
-		this->e[i] = 1.0;
-		this->x[i] = x_init[i];
+		this->bestSpins[i] = 0;
 	}
+
+	initialize_matrix:
+	for(int j=0;j<N;j++){
+	#pragma HLS PIPELINE
+		for(int i=0; i<N; i++){
+            this->J[i][j] = J_init[i][j];
+        }
+    }
+}
+
+void AHC::ahc_solver(
+	data_type_x x_init[N]
+){
+	updateX(x_init);
 
 	setSpins();	// initialize vectors
 	matmul();
@@ -269,8 +284,16 @@ void AHC::ahc_solver(
 		setSpins();
 		IsingEnergy();
 	}
+}
 
-	bestSpins = this->bestSpins;
+data_type_e AHC::bestEnergySpins(
+	spin_sign bestSpins[N]
+){
+	for(int i=0; i<N; i++){
+		bestSpins[i] = this->bestSpins[i];
+	}
+
+	return this->bestEnergy;
 }
 
 // void ahc_top(
@@ -321,8 +344,9 @@ void dut(hls::stream<bit32_t> &strm_in, hls::stream<bit32_t> &strm_out) {
 
 	// call ahc
 	// ahc_top(J_in, x_in, bestSpinsOut);
-	static AHC ahc_instance(J_in);
-	ahc_instance.ahc_solver(x_in, bestSpinsOut);
+	static AHC ahc_instance;
+	ahc_instance.updateJ(J_in);
+	ahc_instance.ahc_solver(x_in);
 
 	// write out the result
 	for (int i = 0; i < N; i++) {
