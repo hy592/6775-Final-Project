@@ -170,8 +170,8 @@ void dut (
 ## Testbench
 
 To run the testbench, run ```make test``` in ```fpga/src/```. Currently, we have two implementations: ```AHC_low``` and ```AHC_new```. Modify 
-- ```make test``` in ```fpga/src/Makefile```'s
-- ```#include```s in ```fpga/src/AHC_test.cpp```'s
+- ```make test``` in ```fpga/src/Makefile```
+- ```#include```s in ```fpga/src/AHC_test.cpp```
 
 to change versions.
 
