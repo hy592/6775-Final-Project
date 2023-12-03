@@ -31,12 +31,14 @@ int main(){
 		bestSpinsOut[i] = 0;
 	}
 
-	ahc_top(J_matrix, x_init, bestSpinsOut);
+	// ahc_top(J_matrix, x_init, bestSpinsOut);
+	static AHC ahc_instance(J_matrix);
+	ahc_instance.ahc_solver(x_init, bestSpinsOut);
 	
 	// print ahc_instance_bestSpins
 	for (int i = 0; i < N; i++)
 	{
-		cout << bestSpinsOut[i] << "  ";
+		std::cout << bestSpinsOut[i] << "  ";
 	}
 
 	printf("Finish Simulation\n");

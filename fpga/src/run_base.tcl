@@ -10,7 +10,8 @@ set hls_prj Ising_Machine.prj
 open_project ${hls_prj} -reset
 
 # Top function of the design
-set_top ahc_top 
+# set_top ahc_top 
+set_top dut
 # change to dut later
 
 # Add design and testbench files
