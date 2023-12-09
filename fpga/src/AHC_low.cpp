@@ -171,7 +171,7 @@ void AHC::update(){
 
 		// this->x[i] += -dt * this->x[i] * ((data_type_x(0.02)) + mu*this->xx[i]);
 		data_type_x this_x_tmp_2;
-		this_x_tmp_2 = (data_type_x(0.02)) + mu*xx[i];
+		this_x_tmp_2 = (data_type_x(0.02)) + mu*xx;
 		this->x[i] += -((this_x_tmp_2 >> 7) + (this_x_tmp_2 >> 9)) * this->x[i];
 
 		// this->de[i] = dt*(-beta * this->e[i] * (this->xx[i] - target_a));
