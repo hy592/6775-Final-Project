@@ -57,7 +57,7 @@ AHC::AHC(){
 void AHC::setSpins(){
 	#pragma HLS INLINE off
 	setSpins_loop:
-	for(int i =0; i < N; i++){
+	for(int i=0; i<N; i++){
 		#pragma HLS PIPELINE
 		if(this->x[i] > 0){
 			this->lastSpins[i] = 1;
@@ -71,22 +71,6 @@ void AHC::setSpins(){
 	}
 }
 
-// void matmul_inner(data_type_J J[N][N], data_type_x x[N], data_type_x MVM_out[N]) {
-// 	// #pragma HLS INLINE
-// 	// Matrix vector product
-// 	// MVM = (J).dot(np.sign(x))
-// 	data_type_J J_tmp[N][N];
-// 	#pragma HLS ARRAY_PARTITION variable=J_tmp complete dim=2
-// 	#pragma HLS ARRAY_PARTITION variable=J complete dim=2
-// 	#pragma HLS ARRAY_PARTITION variable=x complete
-// 	for(int i = 0; i < N; ++i) {
-// 		#pragma HLS pipeline
-// 		for (int j = 0; j < N; ++j) {
-// 			J_tmp[i][j] = J[i][j];
-// 		}
-// 	}
-// }
-
 // Matrix vector product
 void AHC::matmul()
 {
@@ -97,8 +81,10 @@ void AHC::matmul()
 		#pragma HLS PIPELINE
 		this->MVM_out[row] = 0.0;
 	}
+
+	// using column method MVM = \sum_j J[:][j] * x[j]
 	MVM_outer:
-	for(int i = 0; i < N; i++){
+	for(int i=0; i<N; i++){
 		// for each element in x
 		#pragma HLS PIPELINE
 		MVM_inner:
@@ -117,47 +103,12 @@ void AHC::matmul()
 	}
 }
 
-// Matrix vector product
-// void AHC::matmul()
-// {
-// 	#pragma HLS INLINE
-// 	// Matrix vector product
-// 	// MVM = (J).dot(np.sign(x))
-// 	for (int i = 0; i < N; ++i) {
-// 		#pragma HLS PIPELINE
-// 		this->MVM_out[i] = 0.0;
-// 	}
-// 	MVM_outer:
-// 	for(int i = 0; i < N; i++){
-// 		#pragma HLS PIPELINE
-// 		data_type_x tmp = 0.0;
-// 		MVM_inner:
-// 		for(int j = 0; j < N; j++){
-// 			if(this->x[j] == 1){
-// 				tmp += this->J[i][j];
-// 			}
-// 			else if(this->x[j] == -1){
-// 				tmp -= (this->J[i][j]);
-// 				//this->lastSpins[i] = -1;
-// 			}
-// 			else{
-// 				tmp += 0;
-// 				// this->lastSpins[i] = 0;
-// 			}
-// 		}
-// 		this->MVM_out[i] += tmp;
-// 	}
-// 	matmul_inner(this->J, this->x, this->MVM_out);
-// }
-
-
-
 // Calculates the Ising energy
 void AHC::IsingEnergy(){
 	#pragma HLS INLINE off
 	data_type_e energy = 0.0;
 	IsingEnergy_loop: 
-	for(int i = 0; i < N; i++){
+	for(int i=0; i<N; i++){
 		#pragma HLS PIPELINE
 		data_type_e temp;
 		if(this->lastSpins[i]==1){
@@ -171,7 +122,7 @@ void AHC::IsingEnergy(){
 
 	if(energy < this->bestEnergy){
 		this->bestEnergy = energy;
-		for(int k = 0; k < N; k++){
+		for(int k=0; k<N; k++){
 			this->bestSpins[k] = this->lastSpins[k];
 		}
 	}
@@ -181,15 +132,18 @@ void AHC::IsingEnergy(){
 void AHC::update(){
 	#pragma HLS INLINE off
 	// #pragma HLS LATENCY min=4 max=10
-	data_type_x xx[N];
-	data_type_e de[N];
+	// data_type_x xx[N];
+	// data_type_e de[N];
 
-	#pragma HLS ARRAY_PARTITION variable=xx dim=0 complete
-	#pragma HLS ARRAY_PARTITION variable=de dim=0 complete
+	// #pragma HLS ARRAY_PARTITION variable=xx dim=0 complete
+	// #pragma HLS ARRAY_PARTITION variable=de dim=0 complete
 	
 	update_spin_and_error:
-	for(int i=0;i<N;i++){
+	for(int i=0; i<N; i++){
 		#pragma HLS PIPELINE
+
+		data_type_x xx;
+		data_type_e de;
 		// dt   = (1 >> 7) + (1 >> 9); // 0.01
 		// r    = 1 - (1 >> 6) - (1 >> 8); // 0.98
 		// beta = (1 >> 4) + (1 >> 5) + (1 >> 7); // 0.1
@@ -212,7 +166,8 @@ void AHC::update(){
 		this_x_tmp = (this->MVM_out[i] >> 6) + (this->MVM_out[i] >> 8) + (this->MVM_out[i] >> 11);
 		this->x[i] += ((this_x_tmp >> 7) + (this_x_tmp >> 9)) * (this->e[i]);
 
-		xx[i] = (this->x[i] >> 4);
+		// xx[i] = (this->x[i] >> 4);
+		xx = (this->x[i] >> 4);
 
 		// this->x[i] += -dt * this->x[i] * ((data_type_x(0.02)) + mu*this->xx[i]);
 		data_type_x this_x_tmp_2;
@@ -221,9 +176,11 @@ void AHC::update(){
 
 		// this->de[i] = dt*(-beta * this->e[i] * (this->xx[i] - target_a));
 		data_type_x this_tmp_de;
-		this_tmp_de = -(((xx[i] - target_a) >> 4) + ((xx[i] - target_a) >> 5) + ((xx[i] - target_a) >> 7));
-		de[i] = ((this_tmp_de >> 7) + (this_tmp_de >> 9)) * (this->e[i]);
-		this->e[i] += de[i];
+		// this_tmp_de = -(((xx[i] - target_a) >> 4) + ((xx[i] - target_a) >> 5) + ((xx[i] - target_a) >> 7));
+		this_tmp_de = -(((xx - target_a) >> 4) + ((xx - target_a) >> 5) + ((xx - target_a) >> 7));
+
+		de = ((this_tmp_de >> 7) + (this_tmp_de >> 9)) * (this->e[i]);
+		this->e[i] += de;
 	}
 }
 
