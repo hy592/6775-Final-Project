@@ -15,7 +15,7 @@ VHLS_INC=$(XILINX_VIVADO)/include
 # Specify compilation flags
 CFLAGS=-g -I${VHLS_INC} -DHLS_NO_XIL_FPO_LIB -std=c++11 -D VERSION=low
 
-TCL_SCRIPT=run_pipeline.tcl
+TCL_SCRIPT=run_base.tcl
 
 .PHONY: all csim bitstream clean
 
@@ -42,6 +42,15 @@ xillydemo.bit:
 bitstream: xillydemo.bit
 	@echo "Bitstream saved to $<"
 
+AHC-fpga: host.cpp
+	@echo "Compiling host program"
+	g++ ${CFLAGS} $^ -o $@
+	@echo "Make sure bitstream is loaded!"
+
+fpga: AHC-fpga
+	@echo "Running digitrec accelerator ..."
+	./$<
+
 test: AHC_test
 	g++ ${CFLAGS} -o AHC_test AHC_test.cpp AHC_low.cpp
 	./AHC_test > test_output_low.txt
@@ -53,3 +62,4 @@ AHC_test: AHC_test.cpp
 clean:
 	rm -rf digitrec *.dat *.prj *.log
 	rm -rf zedboard_project* xillydemo.bit test_output_low.txt
+	rm -rf digitrec-fpga
