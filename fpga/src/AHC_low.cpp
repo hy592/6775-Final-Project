@@ -144,43 +144,44 @@ void AHC::update(){
 
 		data_type_x xx;
 		data_type_e de;
-		// dt   = (1 >> 7) + (1 >> 9); // 0.01
-		// r    = 1 - (1 >> 6) - (1 >> 8); // 0.98
-		// beta = (1 >> 4) + (1 >> 5) + (1 >> 7); // 0.1
-		// coupling_strength = (1 >> 6) + (1 >> 8) + (1 >> 11); // 0.020
-		// mu = 1.0;
-		// num_time_steps = 200;
-		// target_a_baseline = (1 >> 3) + (1 >> 4) + (1 >> 6); // 0.2
-		// target_a = target_a_baseline;
+		dt   = 0.01; // 0.01
+		r    = 0.98; // 0.98
+		beta = 0.1; // 0.1
+		coupling_strength = 0.020; // 0.020
+		mu = 1.0;
+		num_time_steps = 200;
+		target_a_baseline = 0.2; // 0.2
+		target_a = target_a_baseline;
 		
 		// Update spin vector
-		// this->x[i] += dt * (coupling_strength * this->MVM_out[i])*this->e[i];
-		// this->xx[i] = (this->x[i] >> 4);
-		// this->x[i] += -dt * this->x[i] * ((data_type_x(0.02)) + mu*this->xx[i]);
-		// this->de[i] = dt*(-beta * this->e[i] * (this->xx[i] - target_a));
-        // this->e[i] += de[i];
-
-		data_type_x this_x_tmp;
-		// Update spin vector
-		// this->x[i] += dt * (coupling_strength * this->MVM_out[i])*this->e[i];
-		this_x_tmp = (this->MVM_out[i] >> 6) + (this->MVM_out[i] >> 8) + (this->MVM_out[i] >> 11);
-		this->x[i] += ((this_x_tmp >> 7) + (this_x_tmp >> 9)) * (this->e[i]);
-
-		// xx[i] = (this->x[i] >> 4);
+		this->x[i] += dt * (coupling_strength * this->MVM_out[i])*this->e[i];
 		xx = (this->x[i] >> 4);
+		this->x[i] += -dt * this->x[i] * ((data_type_x(0.02)) + mu*xx);
+		de = dt*(-beta * this->e[i] * (xx - target_a));
+        this->e[i] += de;
+		
+		/////////////////////////// option 2 using shift ////////////////////////////
+		// data_type_x this_x_tmp;
+		// // Update spin vector
+		// // this->x[i] += dt * (coupling_strength * this->MVM_out[i])*this->e[i];
+		// this_x_tmp = (this->MVM_out[i] >> 6) + (this->MVM_out[i] >> 8) + (this->MVM_out[i] >> 11);
+		// this->x[i] += ((this_x_tmp >> 7) + (this_x_tmp >> 9)) * (this->e[i]);
 
-		// this->x[i] += -dt * this->x[i] * ((data_type_x(0.02)) + mu*this->xx[i]);
-		data_type_x this_x_tmp_2;
-		this_x_tmp_2 = (data_type_x(0.02)) + mu*xx;
-		this->x[i] += -((this_x_tmp_2 >> 7) + (this_x_tmp_2 >> 9)) * this->x[i];
+		// // xx[i] = (this->x[i] >> 4);
+		// xx = (this->x[i] >> 4);
 
-		// this->de[i] = dt*(-beta * this->e[i] * (this->xx[i] - target_a));
-		data_type_x this_tmp_de;
-		// this_tmp_de = -(((xx[i] - target_a) >> 4) + ((xx[i] - target_a) >> 5) + ((xx[i] - target_a) >> 7));
-		this_tmp_de = -(((xx - target_a) >> 4) + ((xx - target_a) >> 5) + ((xx - target_a) >> 7));
+		// // this->x[i] += -dt * this->x[i] * ((data_type_x(0.02)) + mu*this->xx[i]);
+		// data_type_x this_x_tmp_2;
+		// this_x_tmp_2 = (data_type_x(0.02)) + mu*xx;
+		// this->x[i] += -((this_x_tmp_2 >> 7) + (this_x_tmp_2 >> 9)) * this->x[i];
 
-		de = ((this_tmp_de >> 7) + (this_tmp_de >> 9)) * (this->e[i]);
-		this->e[i] += de;
+		// // this->de[i] = dt*(-beta * this->e[i] * (this->xx[i] - target_a));
+		// data_type_x this_tmp_de;
+		// // this_tmp_de = -(((xx[i] - target_a) >> 4) + ((xx[i] - target_a) >> 5) + ((xx[i] - target_a) >> 7));
+		// this_tmp_de = -(((xx - target_a) >> 4) + ((xx - target_a) >> 5) + ((xx - target_a) >> 7));
+
+		// de = ((this_tmp_de >> 7) + (this_tmp_de >> 9)) * (this->e[i]);
+		// this->e[i] += de;
 	}
 }
 
