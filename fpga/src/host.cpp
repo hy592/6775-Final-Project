@@ -99,7 +99,7 @@ int main(int argc, char **argv) {
         assert(nbytes == sizeof(test_data_J));
       }
     }
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 20; ++i) {
       for (int j = 0; j < matrix_size; ++j) {
         test_data_X = x_init_arrays[i][j];
         nbytes = write(fdw, (void *)&test_data_X, sizeof(test_data_X));

@@ -290,7 +290,9 @@ void dut(hls::stream<bit32_t> &strm_in, hls::stream<bit32_t> &strm_out) {
 
 	// read J matrix
 	for (int i = 0; i < N; i++) {
+		#pragma HLS pipeline off
 		for (int j = 0; j < N; j++) {	
+			#pragma HLS pipeline
 			input_l = strm_in.read();
 			J_in[i][j] = input_l(MAX_WIDTH-1,0);
 		}
@@ -298,9 +300,11 @@ void dut(hls::stream<bit32_t> &strm_in, hls::stream<bit32_t> &strm_out) {
 	ahc_instance.updateJ(J_in);
 
 	// run 100 sets of X
-	for (int x_iter=0; x_iter<100; x_iter++){
+	for (int x_iter=0; x_iter<20; x_iter++){
+		#pragma HLS pipeline off
 		// read x_init
 		for (int i = 0; i < N; i++) {
+			#pragma HLS pipeline
 			input_l = strm_in.read();
 			x_in[i] = input_l(MAX_WIDTH-1,0);
 		}
@@ -308,8 +312,8 @@ void dut(hls::stream<bit32_t> &strm_in, hls::stream<bit32_t> &strm_out) {
 	}
 	
 	// return the best energy
-	bestEnergy = bestEnergySpins(bestSpinsOut);
-	output(MAX_WIDTH-1:0) = bestEnergy;
+	bestEnergy = ahc_instance.bestEnergySpins(bestSpinsOut);
+	output(MAX_WIDTH-1,0) = bestEnergy;
 	strm_out.write(output);
 
 	// write out the result
