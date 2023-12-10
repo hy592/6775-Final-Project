@@ -285,8 +285,8 @@ void dut(hls::stream<bit32_t> &strm_in, hls::stream<bit32_t> &strm_out) {
 	#pragma HLS ARRAY_PARTITION variable=bestSpinsOut dim=1 complete
 
 	bit32_t input_l;
-	data_type_e output_energy;
-	spin_sign output_spin;
+	bit16_t output_energy;
+	bit2_t output_spin;
 
 	static AHC ahc_instance;
 
@@ -320,7 +320,7 @@ void dut(hls::stream<bit32_t> &strm_in, hls::stream<bit32_t> &strm_out) {
 
 	// write out the result
 	for (int i = 0; i < N; i++) {
-		output_spin(MAX_WIDTH-1,0) = bestSpinsOut[i];
+		output_spin(1,0) = bestSpinsOut[i];
 		strm_out.write(output_spin);
 	}
 }
