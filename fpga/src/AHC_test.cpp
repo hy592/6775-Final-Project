@@ -2,11 +2,12 @@
 #include <fstream>
 #include <iostream>
 #include <random>
+#include <stdlib.h>
 
 #include "AHC_low.h"
 #include "ap_fixed.h"
 
-#define USER "nb498/ece6775"
+#define USER "zs343/ece6775"
 #define PROJECT_DIR_NAME "final_project"
 #define DIR "/home/" USER "/" PROJECT_DIR_NAME "/sample_MIMO"
 #define JMATRICES "/home/" USER "/" PROJECT_DIR_NAME "/fixed_pt_data" 
@@ -79,15 +80,17 @@ int main()
 
   x_init_file.close();
 
-  int numProblems = 10;
+  // int numProblems = 10;
 
   int startNum = 0;
 
   //  Do something with the matrix values here...
 
   for ( int k = startNum; k < startNum + numProblems; k++ ) {
-    ifstream input_file1( JMATRICES + (string)"/DI_MIMO_J_Conv_11_29_16_2_" + std::to_string( k ) + (string)".txt" );
-    std::cout << JMATRICES + (string)"/DI_MIMO_J_Conv_11_29_16_2_" + std::to_string( k ) + (string)".txt" << std::endl;
+    // ifstream input_file1( JMATRICES + (string)"/DI_MIMO_J_Conv_11_29_16_2_" + std::to_string( k ) + (string)".txt" );
+    ifstream input_file1((string)"fixed_pt_data" + (string)"/DI_MIMO_J_Conv_11_29_16_2_" + to_string(k) + (string)".txt");
+    // cout << JMATRICES + (string)"/DI_MIMO_J_Conv_11_29_16_2_" + to_string( k ) + (string)".txt" << endl;
+    cout << (string)"fixed_pt_data" + (string)"/DI_MIMO_J_Conv_11_29_16_2_" + to_string(k) + (string)".txt" << endl;
 
 #ifdef DEBUG
     cout << "INIT SPINS" << endl;
@@ -101,6 +104,8 @@ int main()
         int hex_value;
         input_file1 >> hex >> hex_value;
         matrix[i][j] = static_cast<float>( hex_value ) / 4096.0f;  // 12_2
+        // printf("%X\n", hex_value);
+        // cout << matrix[i][j] << endl;
       }
     }
     top_func_test( matrix, x_init_arrays, k );
