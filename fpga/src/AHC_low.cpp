@@ -276,6 +276,7 @@ void dut(hls::stream<bit32_t> &strm_in, hls::stream<bit32_t> &strm_out) {
 	data_type_J J_in[N][N];
 	data_type_x x_in[N];
 	spin_sign bestSpinsOut[N];
+	data_type_e bestEnergy;
 	
 	// Partition the first dim
 	#pragma HLS ARRAY_PARTITION variable=J_in dim=1 complete
@@ -285,29 +286,35 @@ void dut(hls::stream<bit32_t> &strm_in, hls::stream<bit32_t> &strm_out) {
 	bit32_t input_l;
 	bit32_t output;
 
+	static AHC ahc_instance;
+
 	// read J matrix
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {	
 			input_l = strm_in.read();
-			J_in[i][j] = input_l(15,0);
+			J_in[i][j] = input_l(MAX_WIDTH-1,0);
 		}
 	}
-
-	// read x_init
-	for (int i = 0; i < N; i++) {
-		input_l = strm_in.read();
-		x_in[i] = input_l(15,0);
-	}
-
-	// call ahc
-	// ahc_top(J_in, x_in, bestSpinsOut);
-	static AHC ahc_instance;
 	ahc_instance.updateJ(J_in);
-	ahc_instance.ahc_solver(x_in);
+
+	// run 100 sets of X
+	for (int x_iter=0; x_iter<100; x_iter++){
+		// read x_init
+		for (int i = 0; i < N; i++) {
+			input_l = strm_in.read();
+			x_in[i] = input_l(MAX_WIDTH-1,0);
+		}
+		ahc_instance.ahc_solver(x_in);
+	}
+	
+	// return the best energy
+	bestEnergy = bestEnergySpins(bestSpinsOut);
+	output(MAX_WIDTH-1:0) = bestEnergy;
+	strm_out.write(output);
 
 	// write out the result
 	for (int i = 0; i < N; i++) {
-		output(15,0) = bestSpinsOut[i];
+		output(MAX_WIDTH-1,0) = bestSpinsOut[i];
 		strm_out.write(output);
 	}
 }
