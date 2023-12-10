@@ -52,4 +52,4 @@ AHC_test: AHC_test.cpp
 
 clean:
 	rm -rf digitrec *.dat *.prj *.log
-	rm -rf zedboard_project* xillydemo.bit
+	rm -rf zedboard_project* xillydemo.bit test_output_low.txt

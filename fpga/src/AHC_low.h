@@ -8,6 +8,7 @@ typedef ap_uint<32> bit32_t;
 #define N 65
 #define MAX_WIDTH 16
 #define intBits 2
+#define numProblems 10
 
 typedef ap_fixed<MAX_WIDTH, intBits> data_type_J;       // weights matrix
 typedef ap_fixed<MAX_WIDTH, intBits+1> data_type_x;     // spain vector
