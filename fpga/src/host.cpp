@@ -34,6 +34,12 @@ int main(int argc, char **argv) {
   int fdr = open("/dev/xillybus_read_32", O_RDONLY);
   int fdw = open("/dev/xillybus_write_32", O_WRONLY);  
 
+  // Check that the channels are correctly opened
+  if ((fdr < 0) || (fdw < 0)) {
+    fprintf(stderr, "Failed to open Xillybus device channels\n");
+    return -1;
+  }
+
   // read the initial spins from the file
   std::ifstream x_init_file("init_spins_big.txt");
   if (!x_init_file.is_open())
@@ -88,6 +94,9 @@ int main(int argc, char **argv) {
 
   Timer timer("Ising on FPGA");
   bit32_t nbytes;
+  bit32_t data_write;
+
+
   timer.start();
   //--------------------------------------------------------------------
   // Send data to accelerator
@@ -99,8 +108,9 @@ int main(int argc, char **argv) {
     for (int i = 0; i < matrix_size; i++) {
       for (int j = 0; j < matrix_size; j++) {
         test_data_J = matrix[k][i][j];
-        nbytes = write(fdw, (void *)&test_data_J, sizeof(test_data_J));
-        assert(nbytes == sizeof(test_data_J));
+        data_write(15,0) = test_data_J;
+        nbytes = write(fdw, (void *)&data_write, sizeof(data_write));
+        assert(nbytes == sizeof(data_write));
       }
     }
     std::cout << "send J finish" << k << std::endl;
@@ -109,8 +119,9 @@ int main(int argc, char **argv) {
       std::cout << "  send x" << std::endl;
       for (int j = 0; j < matrix_size; ++j) {
         test_data_X = x_init_arrays[i][j];
-        nbytes = write(fdw, (void *)&test_data_X, sizeof(test_data_X));
-        assert(nbytes == sizeof(test_data_X));  
+        data_write(15,0) = test_data_X;
+        nbytes = write(fdw, (void *)&data_write, sizeof(data_write));
+        assert(nbytes == sizeof(data_write));  
       }
       std::cout << "  send x finish" << std::endl;
     }
