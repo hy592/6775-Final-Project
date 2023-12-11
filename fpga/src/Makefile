@@ -58,6 +58,12 @@ test: AHC_test
 AHC_test: AHC_test.cpp
 	g++ ${CFLAGS} -o AHC_test AHC_test.cpp AHC_low.cpp
 
+test_host: AHC_test_host
+	g++ ${CFLAGS} -o AHC_test AHC_test_host.cpp AHC_low.cpp
+	./AHC_test > test_output_low.txt
+
+AHC_test_host: AHC_test_host.cpp
+	g++ ${CFLAGS} -o AHC_test AHC_test_host.cpp AHC_low.cpp
 
 clean:
 	rm -rf digitrec *.dat *.prj *.log

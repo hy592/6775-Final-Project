@@ -37,3 +37,4 @@ test_output.txt
 fpga/src/zedboard_project
 fpga/src/test_output_low.txt
 fpga/src/zedboard_project.tgz
+fpga/src/xillydemo.bit
