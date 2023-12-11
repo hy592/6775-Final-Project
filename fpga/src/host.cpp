@@ -87,6 +87,7 @@ int main(int argc, char **argv) {
   data_type_J test_data_J;
   data_type_x test_data_X;
   bit16_t energy_fpga[numProblems];
+  bit16_t spins_received;
   bit2_t spin_fpga[numProblems][matrix_size];
 
   data_type_e energy_ref[numProblems];
@@ -143,13 +144,32 @@ int main(int argc, char **argv) {
     std::cout << "  Energy = " << energy_result << std::endl;
 
     std::cout << "  Spin = " << std::endl;
-    for (int i = 0; i < matrix_size; ++i) {
-      nbytes = read(fdr, (void *)&(spin_fpga[k][i]), sizeof(spin_fpga[k][i]));
-      assert(nbytes == sizeof(spin_fpga[k][i]));
-      spin_sign spin_result;
-      spin_result = reinterpret_cast<ap_int<2>&>(spin_fpga[k][i]);
-      std::cout << spin_result << std::endl;
+    for (int i = 0; i < 8; ++i) {
+      nbytes = read(fdr, (void *)&(spins_received), sizeof(spins_received));
+      assert(nbytes == sizeof(spins_received));
+      for (int j=0; j<8; j++){
+        spin_sign spin_result;
+        bit2_t temp_value;
+        temp_value = (spins_received >> (2 * j)) & 0b11;
+        // spin_result = (spins_received >> (2 * j)) & 0b11;
+        spin_result = reinterpret_cast<ap_int<2>&>(temp_value);
+        spin_fpga[k][8*i+j] = spin_result;
+        std::cout << spin_result << std::endl;
+      }
+      // nbytes = read(fdr, (void *)&(spin_fpga[k][i]), sizeof(spin_fpga[k][i]));
+      // assert(nbytes == sizeof(spin_fpga[k][i]));
+      // spin_sign spin_result;
+      // spin_result = reinterpret_cast<ap_int<2>&>(spin_fpga[k][i]);
     }
+    nbytes = read(fdr, (void *)&spins_received, sizeof(spins_received));
+    assert(nbytes == sizeof(spins_received));
+    spin_sign spin_result;
+    // bit2_t temp_value;
+    temp_value = spins_received(1,0);
+    spin_result = reinterpret_cast<ap_int<2>&>(temp_value);
+    // spin_result = spins_received & 0x0003;
+    spin_fpga[k][64] = spin_result;
+    std::cout << spin_result << std::endl;
   }
   std::cout << "End Receive Output" << std::endl;
   timer.stop();

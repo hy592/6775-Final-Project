@@ -77,4 +77,4 @@ class AHC{
 //     spin_sign bestSpinsOut[N]
 // );
 
-void dut(hls::stream<bit32_t> &strm_in, hls::stream<bit32_t> &strm_out);
+void dut(hls::stream<bit16_t> &strm_in, hls::stream<bit16_t> &strm_out);

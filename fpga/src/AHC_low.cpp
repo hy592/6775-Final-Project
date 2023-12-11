@@ -100,7 +100,7 @@ void AHC::matmul()
 	for(int i=0; i<N; i++){
 		// for each element in x
 
-		#pragma HLS PIPELINE
+		#pragma HLS PIPELINE II=33
 		MVM_inner:
 		for(int j = 0; j < N; j++){
 			// multiply with each element on i th column of J
@@ -302,7 +302,7 @@ void dut(hls::stream<bit16_t> &strm_in, hls::stream<bit16_t> &strm_out) {
 
 	bit16_t input_l;
 	bit16_t output_energy;
-	bit2_t output_spin;
+	bit16_t output_spin;
 
 	static AHC ahc_instance;
 
@@ -335,8 +335,18 @@ void dut(hls::stream<bit16_t> &strm_in, hls::stream<bit16_t> &strm_out) {
 	strm_out.write(output_energy);
 
 	// write out the result
-	for (int i = 0; i < N; i++) {
-		output_spin = reinterpret_cast<bit2_t&>(bestSpinsOut[i]);
+	for (int i = 0; i < 8; i++) {
+		output_spin(1,0)   = reinterpret_cast<bit2_t&>(bestSpinsOut[8*i  ]);
+		output_spin(3,2)   = reinterpret_cast<bit2_t&>(bestSpinsOut[8*i+1]);
+		output_spin(5,4)   = reinterpret_cast<bit2_t&>(bestSpinsOut[8*i+2]);
+		output_spin(7,6)   = reinterpret_cast<bit2_t&>(bestSpinsOut[8*i+3]);
+		output_spin(9,8)   = reinterpret_cast<bit2_t&>(bestSpinsOut[8*i+4]);
+		output_spin(11,10) = reinterpret_cast<bit2_t&>(bestSpinsOut[8*i+5]);
+		output_spin(13,12) = reinterpret_cast<bit2_t&>(bestSpinsOut[8*i+6]);
+		output_spin(15,14) = reinterpret_cast<bit2_t&>(bestSpinsOut[8*i+7]);
 		strm_out.write(output_spin);
 	}
+
+	output_spin(1,0)   = reinterpret_cast<bit2_t&>(bestSpinsOut[64]);
+	strm_out.write(output_spin);
 }
