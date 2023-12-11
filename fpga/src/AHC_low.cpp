@@ -58,8 +58,8 @@ AHC::AHC(){
 // This function update the lastSpins based on the current spin values
 // This is used to determine the sign of the spins in the MVM
 void AHC::setSpins(){
-	cout << endl;
-	cout << "INIT SPINS ";
+	// cout << endl;
+	// cout << "INIT SPINS ";
 
 	#pragma HLS INLINE off
 	setSpins_loop:
@@ -67,19 +67,19 @@ void AHC::setSpins(){
 		#pragma HLS PIPELINE
 		if(this->x[i] > 0){
 			this->lastSpins[i] = 1;
-			cout << "1, ";
+			// cout << "1, ";
 		}
 		else if(this->x[i] < 0){
 			this->lastSpins[i] = -1;
-			cout << "-1, ";
+			// cout << "-1, ";
 
 		}
 		else{
 			this->lastSpins[i] = 0;
-			cout << "0, ";
+			// cout << "0, ";
 		}
 	}
-	cout << endl;
+	// cout << endl;
 }
 
 // Matrix vector product
@@ -89,10 +89,10 @@ void AHC::matmul()
 	// Matrix vector product
 	// MVM = (J).dot(np.sign(x))
 	for (int row = 0; row < N; row++) {
-		cout << "MVM[row] is " << MVM_out[row] << " ";
+		// cout << "MVM[row] is " << MVM_out[row] << " ";
 		#pragma HLS PIPELINE
 		this->MVM_out[row] = 0.0;
-		cout << endl;
+		// cout << endl;
 	}
 
 	// using column method MVM = \sum_j J[:][j] * x[j]
@@ -104,14 +104,14 @@ void AHC::matmul()
 		MVM_inner:
 		for(int j = 0; j < N; j++){
 			// multiply with each element on i th column of J
-			cout << this->x[j] << "";
+			// cout << this->x[j] << "";
 			if(this->x[j] > 0){
-				cout << "POS " << this->J[i][j] << endl;
+				// cout << "POS " << this->J[i][j] << endl;
 
 				this->MVM_out[i] += this->J[i][j];
 			}
 			else if(this->x[j] < 0){
-				cout << "NEG " << -(this->J[i][j]) << endl;
+				// cout << "NEG " << -(this->J[i][j]) << endl;
 
 				this->MVM_out[i] += -(this->J[i][j]);
 			}
@@ -120,7 +120,7 @@ void AHC::matmul()
 				this->MVM_out[i] += 0;
 
 
-			 	cout << "NADA";
+			 	// cout << "NADA";
 
 			 }
 		}
@@ -213,11 +213,11 @@ void AHC::updateX(
 	// ap_fixed<MAX_WIDTH, 2> coupling_strength_new, ap_fixed<MAX_WIDTH,2> new_mu
 ){
 
-	cout << " XINIT ";
+	// cout << " XINIT ";
 	initialize_vectors:for(int i=0; i<N; i++){
 		this->e[i] = 1.0;
 		this->x[i] = x_init[i];
-		cout << this->x[i] << ", ";
+		// cout << this->x[i] << ", ";
 		// this->lastSpins[i] = x_init[i];
 		// this->de[i] = 0;
 		// this->coupling_strength = coupling_strength_new;
@@ -300,8 +300,8 @@ void dut(hls::stream<bit32_t> &strm_in, hls::stream<bit32_t> &strm_out) {
 	#pragma HLS ARRAY_PARTITION variable=x_in dim=1 complete
 	#pragma HLS ARRAY_PARTITION variable=bestSpinsOut dim=1 complete
 
-	bit32_t input_l;
-	bit32_t output;
+	bit16_t input_l;
+	bit16_t output;
 
 	static AHC ahc_instance;
 

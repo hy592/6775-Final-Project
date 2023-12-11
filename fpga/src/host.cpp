@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
 
   Timer timer("Ising on FPGA");
   bit32_t nbytes;
-  bit32_t data_write;
+  bit16_t data_write;
 
 
   timer.start();
@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
     for (int i = 0; i < matrix_size; i++) {
       for (int j = 0; j < matrix_size; j++) {
         test_data_J = matrix[k][i][j];
-        data_write = reinterpret_cast<ap_uint<32>&>(test_data_J);
+        data_write = reinterpret_cast<ap_uint<16>&>(test_data_J);
         nbytes = write(fdw, (void *)&data_write, sizeof(data_write));
         assert(nbytes == sizeof(data_write));
       }
