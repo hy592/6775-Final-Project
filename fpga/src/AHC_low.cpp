@@ -58,20 +58,28 @@ AHC::AHC(){
 // This function update the lastSpins based on the current spin values
 // This is used to determine the sign of the spins in the MVM
 void AHC::setSpins(){
+	cout << endl;
+	cout << "INIT SPINS ";
+
 	#pragma HLS INLINE off
 	setSpins_loop:
 	for(int i=0; i<N; i++){
 		#pragma HLS PIPELINE
 		if(this->x[i] > 0){
 			this->lastSpins[i] = 1;
+			cout << "1, ";
 		}
 		else if(this->x[i] < 0){
 			this->lastSpins[i] = -1;
+			cout << "-1, ";
+
 		}
 		else{
 			this->lastSpins[i] = 0;
+			cout << "0, ";
 		}
 	}
+	cout << endl;
 }
 
 // Matrix vector product
@@ -102,6 +110,11 @@ void AHC::matmul()
 			}
 			else if(this->x[j] == -1){
 				this->MVM_out[i] += -(this->J[i][j]);
+			}
+
+			else {
+				this->MVM_out[i] += 0;
+
 			}
 			// else{
 			// 	this->MVM_out[row] += 0;
