@@ -301,7 +301,8 @@ void dut(hls::stream<bit16_t> &strm_in, hls::stream<bit16_t> &strm_out) {
 	#pragma HLS ARRAY_PARTITION variable=bestSpinsOut dim=1 complete
 
 	bit16_t input_l;
-	bit16_t output;
+	bit16_t output_energy;
+	bit2_t output_spin;
 
 	static AHC ahc_instance;
 
@@ -311,7 +312,7 @@ void dut(hls::stream<bit16_t> &strm_in, hls::stream<bit16_t> &strm_out) {
 		for (int j = 0; j < N; j++) {	
 			#pragma HLS pipeline
 			input_l = strm_in.read();
-			J_in[i][j] = input_l(MAX_WIDTH-1,0);
+			J_in[i][j] = reinterpret_cast<data_type_J&>(input_l);
 		}
 	}
 	ahc_instance.updateJ(J_in);
@@ -323,19 +324,19 @@ void dut(hls::stream<bit16_t> &strm_in, hls::stream<bit16_t> &strm_out) {
 		for (int i = 0; i < N; i++) {
 			#pragma HLS pipeline
 			input_l = strm_in.read();
-			x_in[i] = input_l(MAX_WIDTH-1,0);
+			x_in[i] = reinterpret_cast<data_type_x&>(input_l);
 		}
 		ahc_instance.ahc_solver(x_in);
 	}
 	
 	// return the best energy
 	bestEnergy = ahc_instance.bestEnergySpins(bestSpinsOut);
-	output(MAX_WIDTH-1,0) = bestEnergy;
-	strm_out.write(output);
+	output_energy = reinterpret_cast<bit16_t&>(bestEnergy);
+	strm_out.write(output_energy);
 
 	// write out the result
 	for (int i = 0; i < N; i++) {
-		output(MAX_WIDTH-1,0) = bestSpinsOut[i];
-		strm_out.write(output);
+		output_spin = reinterpret_cast<bit2_t&>(bestSpinsOut[i]);
+		strm_out.write(output_spin);
 	}
 }
