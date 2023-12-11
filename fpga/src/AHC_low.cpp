@@ -1,5 +1,5 @@
 #include "AHC_low.h"
-//#include "iostream"
+#include "iostream"
 //#include <fstream>
 
 //Define output array
@@ -15,8 +15,11 @@ float x2_debug[150][65];
 
 
 #define LAST
-//using std::cout;
-//using std::endl;
+using std::cout;
+using std::endl;
+
+
+
 
 AHC::AHC(){
 // Partition local variables to improve bandwidth
@@ -28,10 +31,10 @@ AHC::AHC(){
 	// Initialize the AHC solver
 	this->dt   = 0.01;
 	this->r    = 0.98;
-	this->beta = 0.1;
-	this->coupling_strength = 0.020;
+	this->beta = 1;
+	this->coupling_strength = 0.20;
 	this->mu = 1.0;
-	this->num_time_steps = 200;
+	this->num_time_steps = 1;
 	this->target_a_baseline = 0.2;
 	this->target_a = target_a_baseline;
 
@@ -78,23 +81,27 @@ void AHC::matmul()
 	// Matrix vector product
 	// MVM = (J).dot(np.sign(x))
 	for (int row = 0; row < N; row++) {
+		cout << "MVM[row] is " << MVM_out[row] << " ";
 		#pragma HLS PIPELINE
 		this->MVM_out[row] = 0.0;
+		cout << endl;
 	}
 
 	// using column method MVM = \sum_j J[:][j] * x[j]
 	MVM_outer:
 	for(int i=0; i<N; i++){
 		// for each element in x
+
 		#pragma HLS PIPELINE
 		MVM_inner:
-		for(int row = 0; row < N; row++){
+		for(int j = 0; j < N; j++){
 			// multiply with each element on i th column of J
-			if(this->x[i] == 1){
-				this->MVM_out[row] += this->J[row][i];
+
+			if(this->x[j] == 1){
+				this->MVM_out[i] += this->J[i][j];
 			}
-			else if(this->x[i] == -1){
-				this->MVM_out[row] -= this->J[row][i];
+			else if(this->x[j] == -1){
+				this->MVM_out[i] += -(this->J[i][j]);
 			}
 			// else{
 			// 	this->MVM_out[row] += 0;
@@ -112,12 +119,11 @@ void AHC::IsingEnergy(){
 		#pragma HLS PIPELINE
 		data_type_e temp;
 		if(this->lastSpins[i]==1){
-			temp = -((this->MVM_out[i]) >> 1);
+			energy += -((this->MVM_out[i])) >> 1;
 		}
 		else if(this->lastSpins[i]==-1){
-			temp = (this->MVM_out[i] >> 1);
+			energy += (this->MVM_out[i]) >> 1;
 		}
-		energy += temp;
 	}
 
 	if(energy < this->bestEnergy){
@@ -142,23 +148,13 @@ void AHC::update(){
 	for(int i=0; i<N; i++){
 		#pragma HLS PIPELINE
 
-		data_type_x xx;
-		data_type_e de;
-		dt   = 0.01; // 0.01
-		r    = 0.98; // 0.98
-		beta = 0.1; // 0.1
-		coupling_strength = 0.020; // 0.020
-		mu = 1.0;
-		num_time_steps = 200;
-		target_a_baseline = 0.2; // 0.2
-		target_a = target_a_baseline;
 		
 		// Update spin vector
 		this->x[i] += dt * (coupling_strength * this->MVM_out[i])*this->e[i];
-		xx = (this->x[i] >> 4);
+		xx[i] = (this->x[i] * this->x[i]);
 		this->x[i] += -dt * this->x[i] * ((data_type_x(0.02)) + mu*xx);
-		de = dt*(-beta * this->e[i] * (xx - target_a));
-        this->e[i] += de;
+		this->de[i] = dt*(-(this->beta) * this->e[i] * (xx[i] - target_a));
+        this->e[i] += de[i];
 		
 		/////////////////////////// option 2 using shift ////////////////////////////
 		// data_type_x this_x_tmp;
@@ -199,9 +195,12 @@ void AHC::updateX(
 	data_type_x x_init[N]
 	// ap_fixed<MAX_WIDTH, 2> coupling_strength_new, ap_fixed<MAX_WIDTH,2> new_mu
 ){
+
+	cout << " XINIT ";
 	initialize_vectors:for(int i=0; i<N; i++){
 		this->e[i] = 1.0;
 		this->x[i] = x_init[i];
+		cout << this->x[i] << ", ";
 		// this->lastSpins[i] = x_init[i];
 		// this->de[i] = 0;
 		// this->coupling_strength = coupling_strength_new;
@@ -235,7 +234,7 @@ void AHC::ahc_solver(
 	matmul();
 
 	TIME_STEP_LOOP:
-	for(int time_step=0; time_step < 200; time_step++){
+	for(int time_step=0; time_step < num_time_steps; time_step++){
 		update();
 		setSpins();
 		matmul();
@@ -285,8 +284,7 @@ void dut(hls::stream<bit32_t> &strm_in, hls::stream<bit32_t> &strm_out) {
 	#pragma HLS ARRAY_PARTITION variable=bestSpinsOut dim=1 complete
 
 	bit32_t input_l;
-	bit16_t output_energy;
-	bit2_t output_spin;
+	bit32_t output;
 
 	static AHC ahc_instance;
 
@@ -315,12 +313,12 @@ void dut(hls::stream<bit32_t> &strm_in, hls::stream<bit32_t> &strm_out) {
 	
 	// return the best energy
 	bestEnergy = ahc_instance.bestEnergySpins(bestSpinsOut);
-	output_energy(MAX_WIDTH-1,0) = bestEnergy;
-	strm_out.write(output_energy);
+	output(MAX_WIDTH-1,0) = bestEnergy;
+	strm_out.write(output);
 
 	// write out the result
 	for (int i = 0; i < N; i++) {
-		output_spin(1,0) = bestSpinsOut[i];
-		strm_out.write(output_spin);
+		output(MAX_WIDTH-1,0) = bestSpinsOut[i];
+		strm_out.write(output);
 	}
 }

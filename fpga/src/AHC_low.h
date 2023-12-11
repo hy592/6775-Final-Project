@@ -4,13 +4,11 @@
 #include <hls_stream.h>
 
 typedef ap_uint<32> bit32_t;
-typedef ap_uint<16> bit16_t;
-typedef ap_uint<2> bit2_t;
 
 #define N 65
 #define MAX_WIDTH 16
 #define intBits 2
-#define numProblems 1
+#define numProblems 10
 
 typedef ap_fixed<MAX_WIDTH, intBits> data_type_J;       // weights matrix
 typedef ap_fixed<MAX_WIDTH, intBits+1> data_type_x;     // spain vector
@@ -60,7 +58,10 @@ class AHC{
 
         data_type_J J[N][N];
         data_type_x x[N];
+        data_type_x xx[N];
+
         data_type_x MVM_out[N];
+        data_type_e de[N];
         data_type_e e[N];
 
         data_type_e bestEnergy = 10;
