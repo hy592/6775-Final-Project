@@ -289,7 +289,7 @@ data_type_e AHC::bestEnergySpins(
 // Top function
 //----------------------------------------------------------
 
-void dut(hls::stream<bit32_t> &strm_in, hls::stream<bit32_t> &strm_out) {
+void dut(hls::stream<bit16_t> &strm_in, hls::stream<bit16_t> &strm_out) {
 	data_type_J J_in[N][N];
 	data_type_x x_in[N];
 	spin_sign bestSpinsOut[N];
