@@ -12,7 +12,7 @@ typedef ap_uint<32> bit32_t;
 
 typedef ap_fixed<MAX_WIDTH, intBits> data_type_J;       // weights matrix
 typedef ap_fixed<MAX_WIDTH, intBits+1> data_type_x;     // spain vector
-typedef ap_fixed<MAX_WIDTH, intBits+4> data_type_e;     // energy vector
+typedef ap_fixed<MAX_WIDTH, intBits+3> data_type_e;     // energy vector
 typedef half data_t;  // Use data-type half
 typedef ap_int<2> spin_sign;
 

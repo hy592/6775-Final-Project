@@ -34,7 +34,7 @@ AHC::AHC(){
 	this->beta = 1;
 	this->coupling_strength = 0.20;
 	this->mu = 1.0;
-	this->num_time_steps = 1;
+	this->num_time_steps = 3;
 	this->target_a_baseline = 0.2;
 	this->target_a = target_a_baseline;
 
@@ -104,21 +104,25 @@ void AHC::matmul()
 		MVM_inner:
 		for(int j = 0; j < N; j++){
 			// multiply with each element on i th column of J
+			cout << this->x[j] << "";
+			if(this->x[j] > 0){
+				cout << "POS " << this->J[i][j] << endl;
 
-			if(this->x[j] == 1){
 				this->MVM_out[i] += this->J[i][j];
 			}
-			else if(this->x[j] == -1){
+			else if(this->x[j] < 0){
+				cout << "NEG " << -(this->J[i][j]) << endl;
+
 				this->MVM_out[i] += -(this->J[i][j]);
 			}
 
 			else {
 				this->MVM_out[i] += 0;
 
-			}
-			// else{
-			// 	this->MVM_out[row] += 0;
-			// }
+
+			 	cout << "NADA";
+
+			 }
 		}
 	}
 }
