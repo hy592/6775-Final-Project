@@ -62,11 +62,13 @@ int main(int argc, char **argv) {
   }
   x_init_file.close();
 
+  std::string k_array[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+
   for (int k = 0; k < numProblems; k++) {
     // std::string file_path = (string)"fixed_pt_data/" + (string)"DI_MIMO_J_Conv_11_29_16_2_" + std::to_string(k) + (string)".txt";
     // ifstream input_file1((string)"fixed_pt_data/" + (string)"DI_MIMO_J_Conv_11_29_16_2_" + std::to_string(k) + (string)".txt");
     // Use stringstream to concatenate integer and string
-    std::ifstream input_file1("fixed_pt_data/DI_MIMO_J_Conv_11_29_16_2_0.txt");
+    std::ifstream input_file1("fixed_pt_data/DI_MIMO_J_Conv_11_29_16_2_" + k_array[k] + ".txt");
 
     if (!input_file1.is_open()){
       std::cout << "Error opening file!" << std::endl;
