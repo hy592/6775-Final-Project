@@ -289,7 +289,7 @@ data_type_e AHC::bestEnergySpins(
 // Top function
 //----------------------------------------------------------
 
-void dut(hls::stream<bit16_t> &strm_in, hls::stream<bit16_t> &strm_out) {
+void dut(hls::stream<bit32_t> &strm_in, hls::stream<bit32_t> &strm_out) {
 	data_type_J J_in[N][N];
 	data_type_x x_in[N];
 	spin_sign bestSpinsOut[N];
@@ -300,9 +300,9 @@ void dut(hls::stream<bit16_t> &strm_in, hls::stream<bit16_t> &strm_out) {
 	#pragma HLS ARRAY_PARTITION variable=x_in dim=1 complete
 	#pragma HLS ARRAY_PARTITION variable=bestSpinsOut dim=1 complete
 
-	bit16_t input_l;
-	bit16_t output_energy;
-	bit16_t output_spin;
+	bit32_t input_l;
+	bit32_t output_energy;
+	bit32_t output_spin;
 
 	static AHC ahc_instance;
 
@@ -312,7 +312,10 @@ void dut(hls::stream<bit16_t> &strm_in, hls::stream<bit16_t> &strm_out) {
 		for (int j = 0; j < N; j++) {	
 			#pragma HLS pipeline
 			input_l = strm_in.read();
-			J_in[i][j] = reinterpret_cast<data_type_J&>(input_l);
+			data_type_J J_receive;
+			J_receive(MAX_WIDTH-1,0) = input_l(MAX_WIDTH-1,0);
+			J_in[i][j] = J_receive;
+			// cout << "J " << J_receive << endl;
 		}
 	}
 	ahc_instance.updateJ(J_in);
@@ -324,14 +327,17 @@ void dut(hls::stream<bit16_t> &strm_in, hls::stream<bit16_t> &strm_out) {
 		for (int i = 0; i < N; i++) {
 			#pragma HLS pipeline
 			input_l = strm_in.read();
-			x_in[i] = reinterpret_cast<data_type_x&>(input_l);
+			data_type_x X_receive;
+			X_receive(MAX_WIDTH-1,0) = input_l(MAX_WIDTH-1,0);
+			x_in[i] = X_receive;
+			// cout << "x " << X_receive << endl;
 		}
 		ahc_instance.ahc_solver(x_in);
 	}
 	
 	// return the best energy
 	bestEnergy = ahc_instance.bestEnergySpins(bestSpinsOut);
-	output_energy = reinterpret_cast<bit16_t&>(bestEnergy);
+	output_energy(MAX_WIDTH-1,0) = reinterpret_cast<bit16_t&>(bestEnergy);
 	strm_out.write(output_energy);
 
 	// write out the result

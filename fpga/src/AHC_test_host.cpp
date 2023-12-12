@@ -28,7 +28,7 @@ const int matrix_size = N; // Size of the matrix, N
 // }
 
 int main(int argc, char **argv) {
-  hls::stream<bit16_t> strm_in, strm_out;
+  hls::stream<bit32_t> strm_in, strm_out;
 
   // Define the J matrix and the initial spins
   data_type_J matrix[numProblems][matrix_size][matrix_size];
@@ -92,7 +92,7 @@ int main(int argc, char **argv) {
   data_type_J test_data_J;
   data_type_x test_data_X;
   bit16_t energy_fpga[numProblems];
-  bit16_t spins_received;
+  bit32_t spins_received;
   bit2_t spin_fpga[numProblems][matrix_size];
 
   data_type_e energy_ref[numProblems];
@@ -100,8 +100,8 @@ int main(int argc, char **argv) {
 
   Timer timer("Ising on FPGA");
   bit32_t nbytes;
-  bit16_t data_write;
-
+  bit32_t data_write;
+  data_write = 0;
 
   timer.start();
   //--------------------------------------------------------------------
@@ -114,7 +114,8 @@ int main(int argc, char **argv) {
     for (int i = 0; i < matrix_size; i++) {
       for (int j = 0; j < matrix_size; j++) {
         test_data_J = matrix[k][i][j];
-        data_write = reinterpret_cast<ap_uint<16>&>(test_data_J);
+        // data_write(MAX_WIDTH-1,0) = reinterpret_cast<ap_uint<16>&>(test_data_J);
+        data_write(MAX_WIDTH-1,0) = test_data_J(MAX_WIDTH-1,0);
         // nbytes = write(fdw, (void *)&data_write, sizeof(data_write));
         // assert(nbytes == sizeof(data_write));
         strm_in.write(data_write);
@@ -126,7 +127,8 @@ int main(int argc, char **argv) {
       std::cout << "  send x" << std::endl;
       for (int j = 0; j < matrix_size; ++j) {
         test_data_X = x_init_arrays[i][j];
-        data_write = reinterpret_cast<ap_uint<16>&>(test_data_X);
+        // data_write(MAX_WIDTH-1,0) = reinterpret_cast<ap_uint<16>&>(test_data_X);
+        data_write(MAX_WIDTH-1,0) = test_data_X(MAX_WIDTH-1,0);
         // nbytes = write(fdw, (void *)&data_write, sizeof(data_write));
         // assert(nbytes == sizeof(data_write));  
         strm_in.write(data_write);
@@ -150,10 +152,12 @@ int main(int argc, char **argv) {
   for (int k = 0; k < numProblems; ++k) {
     std::cout << "k=" << k << std::endl;
     data_type_e energy_result;
+    bit32_t energy_received;
 
     // nbytes = read(fdr, (void *)&(energy_fpga[k]), sizeof(energy_fpga[k]));
     // assert(nbytes == sizeof(energy_fpga[k]));
-    energy_fpga[k] = strm_out.read();
+    energy_received = strm_out.read();
+    energy_fpga[k] = energy_received(MAX_WIDTH-1,0);
     energy_result = reinterpret_cast<data_type_e&>(energy_fpga[k]);
     std::cout << "  Energy = " << energy_result << std::endl;
 
