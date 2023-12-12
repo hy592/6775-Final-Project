@@ -109,8 +109,8 @@ int main(int argc, char **argv) {
   //--------------------------------------------------------------------
   std::cout << "Start FPGA Send Data" << std::endl;
   for (int k = 0; k < numProblems; ++k) {
-    std::cout << "k=" << k << std::endl;
-    std::cout << "send J"<< std::endl;
+    // std::cout << "k=" << k << std::endl;
+    // std::cout << "send J"<< std::endl;
     for (int i = 0; i < matrix_size; i++) {
       for (int j = 0; j < matrix_size; j++) {
         test_data_J = matrix[k][i][j];
@@ -121,10 +121,10 @@ int main(int argc, char **argv) {
         strm_in.write(data_write);
       }
     }
-    std::cout << "send J finish" << k << std::endl;
+    // std::cout << "send J finish" << k << std::endl;
     for (int i = 0; i < 20; ++i) {
-      std::cout << "  i=" << i << std::endl;
-      std::cout << "  send x" << std::endl;
+      // std::cout << "  i=" << i << std::endl;
+      // std::cout << "  send x" << std::endl;
       for (int j = 0; j < matrix_size; ++j) {
         test_data_X = x_init_arrays[i][j];
         // data_write(MAX_WIDTH-1,0) = reinterpret_cast<ap_uint<16>&>(test_data_X);
@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
         // test_data_X = data_write(15, 0);
         // std::cout << "test=" << data_write << std::endl;
       }
-      std::cout << "  send x finish" << std::endl;
+      // std::cout << "  send x finish" << std::endl;
     }
   }
   std::cout << "Finish FPGA send Data" << std::endl;
@@ -159,9 +159,9 @@ int main(int argc, char **argv) {
     energy_received = strm_out.read();
     energy_fpga[k] = energy_received(MAX_WIDTH-1,0);
     energy_result = reinterpret_cast<data_type_e&>(energy_fpga[k]);
-    std::cout << "  Energy = " << energy_result << std::endl;
+    std::cout << "BEST ENERGY = " << energy_result << std::endl;
 
-    std::cout << "  Spin = " << std::endl;
+    std::cout << "Spin = " << std::endl;
     for (int i = 0; i < 8; ++i) {
       // nbytes = read(fdr, (void *)&(spins_received), sizeof(spins_received));
       // assert(nbytes == sizeof(spins_received));

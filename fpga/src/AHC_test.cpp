@@ -34,7 +34,8 @@ void top_func_test( data_type_J J[N][N], data_type_x init_spins[20][N], int prob
   // spin_sign spin_guesses[N];
 
   std::cout << "BEST ENERGY = " << bestEnergy << endl;
-
+  
+  std::cout << "Spin = " << std::endl;
   for (int i = 0; i < N; ++i)
   {
     std::cout << bestSpins[i] << std::endl;

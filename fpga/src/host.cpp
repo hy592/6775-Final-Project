@@ -89,7 +89,6 @@ int main(int argc, char **argv) {
   data_type_J test_data_J;
   data_type_x test_data_X;
   bit16_t energy_fpga[numProblems];
-  bit16_t spins_received;
   bit2_t spin_fpga[numProblems][matrix_size];
 
   data_type_e energy_ref[numProblems];
@@ -97,8 +96,8 @@ int main(int argc, char **argv) {
 
   Timer timer("Ising on FPGA");
   bit32_t nbytes;
-  bit16_t data_write;
-
+  bit32_t data_write;
+  data_write = 0;
 
   timer.start();
   //--------------------------------------------------------------------
@@ -106,29 +105,29 @@ int main(int argc, char **argv) {
   //--------------------------------------------------------------------
   std::cout << "Start FPGA Send Data" << std::endl;
   for (int k = 0; k < numProblems; ++k) {
-    std::cout << "k=" << k << std::endl;
-    std::cout << "send J"<< std::endl;
+    // std::cout << "k=" << k << std::endl;
+    // std::cout << "send J"<< std::endl;
     for (int i = 0; i < matrix_size; i++) {
       for (int j = 0; j < matrix_size; j++) {
         test_data_J = matrix[k][i][j];
-        data_write = reinterpret_cast<ap_uint<16>&>(test_data_J);
+        data_write(MAX_WIDTH-1,0) = test_data_J(MAX_WIDTH-1,0);
         nbytes = write(fdw, (void *)&data_write, sizeof(data_write));
         assert(nbytes == sizeof(data_write));
       }
     }
-    std::cout << "send J finish" << k << std::endl;
+    // std::cout << "send J finish" << k << std::endl;
     for (int i = 0; i < 20; ++i) {
-      std::cout << "  i=" << i << std::endl;
-      std::cout << "  send x" << std::endl;
+      // std::cout << "  i=" << i << std::endl;
+      // std::cout << "  send x" << std::endl;
       for (int j = 0; j < matrix_size; ++j) {
         test_data_X = x_init_arrays[i][j];
-        data_write = reinterpret_cast<ap_uint<16>&>(test_data_X);
+        data_write(MAX_WIDTH-1,0) = test_data_X(MAX_WIDTH-1,0);
         nbytes = write(fdw, (void *)&data_write, sizeof(data_write));
         assert(nbytes == sizeof(data_write));  
         // test_data_X = data_write(15, 0);
         // std::cout << "test=" << data_write << std::endl;
       }
-      std::cout << "  send x finish" << std::endl;
+      // std::cout << "  send x finish" << std::endl;
     }
   }
   std::cout << "Finish FPGA send Data" << std::endl;
@@ -138,19 +137,22 @@ int main(int argc, char **argv) {
   std::cout << "Receive Output" << std::endl;
   for (int k = 0; k < numProblems; ++k) {
     std::cout << "k=" << k << std::endl;
+    bit32_t energy_received;
     data_type_e energy_result;
 
-    nbytes = read(fdr, (void *)&(energy_fpga[k]), sizeof(energy_fpga[k]));
-    assert(nbytes == sizeof(energy_fpga[k]));
+    nbytes = read(fdr, (void *)&(energy_received), sizeof(energy_received));
+    assert(nbytes == sizeof(energy_received));
+    energy_fpga[k] = energy_received(MAX_WIDTH-1,0);
     energy_result = reinterpret_cast<data_type_e&>(energy_fpga[k]);
-    std::cout << "  Energy = " << energy_result << std::endl;
+    std::cout << "BEST ENERGY = " << energy_result << std::endl;
 
-    std::cout << "  Spin = " << std::endl;
+    std::cout << "Spin = " << std::endl;
+    bit32_t spins_received;
+    spin_sign spin_result;
     for (int i = 0; i < 8; ++i) {
       nbytes = read(fdr, (void *)&(spins_received), sizeof(spins_received));
       assert(nbytes == sizeof(spins_received));
       for (int j=0; j<8; j++){
-        spin_sign spin_result;
         bit2_t temp_value;
         temp_value = (spins_received >> (2 * j)) & 0b11;
         // spin_result = (spins_received >> (2 * j)) & 0b11;
@@ -158,18 +160,12 @@ int main(int argc, char **argv) {
         spin_fpga[k][8*i+j] = spin_result;
         std::cout << spin_result << std::endl;
       }
-      // nbytes = read(fdr, (void *)&(spin_fpga[k][i]), sizeof(spin_fpga[k][i]));
-      // assert(nbytes == sizeof(spin_fpga[k][i]));
-      // spin_sign spin_result;
-      // spin_result = reinterpret_cast<ap_int<2>&>(spin_fpga[k][i]);
     }
     nbytes = read(fdr, (void *)&spins_received, sizeof(spins_received));
     assert(nbytes == sizeof(spins_received));
-    spin_sign spin_result;
-    // bit2_t temp_value;
+    bit2_t temp_value;
     temp_value = spins_received(1,0);
     spin_result = reinterpret_cast<ap_int<2>&>(temp_value);
-    // spin_result = spins_received & 0x0003;
     spin_fpga[k][64] = spin_result;
     std::cout << spin_result << std::endl;
   }

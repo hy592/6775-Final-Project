@@ -9,7 +9,7 @@
 
 
 INC_PATH=/usr/include/vivado_hls
-CFLAGS = -I${INC_PATH}
+CFLAGS = -I${INC_PATH} -std=c++11
 
 .PHONY: all sw fpga
 
