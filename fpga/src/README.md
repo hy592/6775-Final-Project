@@ -1,11 +1,30 @@
 # Final Project README
 
 ## Run C Simulation
+- ecelinux
 
+To run the software on ecelinux, first go to the `6775-Final-Project/fpga/src` directory, then run `make test`
+
+The simulation result will be write into `test_output_low.txt` with paired `bestEnergy` and `spins`.
+
+To check the functionality of dut and host program on software, run `make test_host`. `test_output_host.txt` should give exactly the same `bestEnergy` and `spins` as `test_output_low.txt` gives.
+
+```bash
+cd 6775-Final-Project/fpga/src # main path
+
+source /classes/ece6775/setup-ece6775.sh # setup env
+
+make test # do software simulation for functionality
+
+make test_host # do software simulation with dut/host program
+```
 ## Run C Synthesis
 ```bash
+cd 6775-Final-Project/fpga/src # main path
+
 source /classes/ece6775/setup-ece6775.sh # setup env
-vitis_hls -f run_base.tcl
+
+vivado_hls -f run_base.tcl # C Synthesis
 ```
 <!-- You will implement and evaluate the performance for three designs:
 
@@ -13,51 +32,19 @@ vitis_hls -f run_base.tcl
 - An unrolled digitrec design which is similar to what you did in Lab 2 where unrolling and array partitioning are applied (`vivado_hls -f run_unroll.tcl`).
 - A pipelined digitrec design which applies loop pipelining in addition to the previous optimizations (`vivado_hls -f run_pipeline.tcl`). -->
 
-## Coding and Debugging
-- ecelinux
-
-To run the software on ecelinux, first go to the `lab3/ecelinux` directory, then run `make`
-
-```bash
-# in ecelinux
-unzip lab3.zip # unzip the archive
-cd lab3/ecelinux
-source /classes/ece6775/setup-ece6775.sh # setup env
-make # builds and runs the csim
-```
-- Zedboard
-
-To run the software on a ZedBoard (i.e., ARM CPU), first copy lab3 files to a ZedBoard, 
-
-```bash
-# in ecelinux
-zip -r lab3.zip lab3  # zip the file. -x to ignore unwanted file
-scp lab3.zip <user>@zhang-zedboard-xx.ece.cornell.edu:~
-ssh <user>@zhang-zedboard-xx.ece.cornell.edu # log in to a ZedBoard
-```
-
-then go to the directory `lab3/zedboard`, finally run `make sw` .
-```bash
-# in zedboard
-unzip lab3.zip # unzip the archive
-cd lab3/zedboard
-
-make sw # builds and runs software
-```
-
 ## Generating the Bitstream
 
 1. The first step is to generate verilog from HLS
 ```bash
 # In ecelinux
-cd lab3/ecelinux
+cd 6775-Final-Project/fpga/src # main path
+
 source /classes/ece6775/setup-ece6775.sh # setup env
-make                  # builds and runs the csim
+
+make test # builds and runs the csim
 
 # generate Verilog
 vivado_hls -f run_base.tcl
-vivado_hls -f run_unroll.tcl
-vivado_hls -f run_pipeline.tcl
 ```
 
 You can examine the directory cordic.prj/solution1/syn/verilog to check that the Verilog files have been generated.
@@ -96,76 +83,40 @@ mount /mnt/sd
 
 # Copy the bitstream file to the SD card and reboot the Zedboard
 cp xillydemo.bit /mnt/sd
-sudo reboot
+
+sudo reboot # restart Zedboard
 ```
 The Zedboard will restart. Wait about 30 seconds and login again — the FPGA will be fully programmed after the reboot
 
-Then, to execute the accelerator on the FPGA, you need go to directory `../zedboard` and run `make fpga`.
+## Run FPGA Experiment
+- Zedboard
+
+To run the FPGA experiment on a Zedboard, first copy `6775-Final-Project` files to a Zedboard, 
 
 ```bash
-# Login to the Zedboard
-ssh hy592@zhang-zedboard-09.ece.cornell.edu
-# run FPGA program
-cd lab3/zedboard
-make fpga
+# in ecelinux
+zip -r final_project.zip 6775-Final-Project  # zip the file
+
+scp final_project.zip <user>@zhang-zedboard-xx.ece.cornell.edu:~ # copy zip file to zedboard
+
+ssh <user>@zhang-zedboard-xx.ece.cornell.edu # log in to a Zedboard
 ```
+
+then go to the directory `6775-Final-Project/fpga/src`, finally run `make fpga`.
+
+Notice, need to rename `Makefile_fpga` to `Makefile` so run on Zedboard environment.
 
 ```bash
-# update host.cpp
-scp host.bit hy592@zhang-zedboard-09.ece.cornell.edu:~
+# in zedboard
+unzip final_project.zip # unzip the archive
+
+cd 6775-Final-Project/fpga/src # main path
+
+mv Makefile_fpga Makefile # for Zedboard Environment
+
+make fpga # builds and runs FPGA experiment
 ```
 
-## 
-
-## dut interface
-```cpp
-#include <hls_stream.h>
-
-//-----------------------------------
-// dut function (top module)
-//-----------------------------------
-// @param[in]  : strm_in - input stream
-// @param[out] : strm_out - output stream 
-void dut (
-    hls::stream<bit32_t> &strm_in,
-    hls::stream<bit32_t> &strm_out
-)
-{
-  // define variables
-  theta_type theta;
-  cos_sin_type c, s;
-
-  // ------------------------------------------------------
-  // Input processing
-  // ------------------------------------------------------
-  // Read the two input 32-bit words (low word first)
-  bit32_t input_lo = strm_in.read();
-  bit32_t input_hi = strm_in.read();
-
-  // Convert input raw bits to fixed-point representation via bit slicing
-  theta(31, 0) = input_lo;
-  theta(theta.length()-1, 32) = input_hi;
-
-  // ------------------------------------------------------
-  // Call CORDIC 
-  // ------------------------------------------------------
-  cordic( theta, s, c );
-
-  // ------------------------------------------------------
-  // Output processing
-  // ------------------------------------------------------
-  // Write out the cos value (low word first)
-  strm_out.write( c(31, 0) );
-  strm_out.write( c(c.length()-1, 32) );
-  
-  // Write out the sin value (low word first)
-  strm_out.write( s(31, 0) );
-  strm_out.write( s(s.length()-1, 32) );
-}
-
-```
-
-##
 
 ## Testbench
 
