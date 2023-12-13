@@ -1,669 +1,9 @@
 Start FPGA Send Data
-k=0
-send J
-send J finish0
-  i=0
-  send x
-  send x finish
-  i=1
-  send x
-  send x finish
-  i=2
-  send x
-  send x finish
-  i=3
-  send x
-  send x finish
-  i=4
-  send x
-  send x finish
-  i=5
-  send x
-  send x finish
-  i=6
-  send x
-  send x finish
-  i=7
-  send x
-  send x finish
-  i=8
-  send x
-  send x finish
-  i=9
-  send x
-  send x finish
-  i=10
-  send x
-  send x finish
-  i=11
-  send x
-  send x finish
-  i=12
-  send x
-  send x finish
-  i=13
-  send x
-  send x finish
-  i=14
-  send x
-  send x finish
-  i=15
-  send x
-  send x finish
-  i=16
-  send x
-  send x finish
-  i=17
-  send x
-  send x finish
-  i=18
-  send x
-  send x finish
-  i=19
-  send x
-  send x finish
-k=1
-send J
-send J finish1
-  i=0
-  send x
-  send x finish
-  i=1
-  send x
-  send x finish
-  i=2
-  send x
-  send x finish
-  i=3
-  send x
-  send x finish
-  i=4
-  send x
-  send x finish
-  i=5
-  send x
-  send x finish
-  i=6
-  send x
-  send x finish
-  i=7
-  send x
-  send x finish
-  i=8
-  send x
-  send x finish
-  i=9
-  send x
-  send x finish
-  i=10
-  send x
-  send x finish
-  i=11
-  send x
-  send x finish
-  i=12
-  send x
-  send x finish
-  i=13
-  send x
-  send x finish
-  i=14
-  send x
-  send x finish
-  i=15
-  send x
-  send x finish
-  i=16
-  send x
-  send x finish
-  i=17
-  send x
-  send x finish
-  i=18
-  send x
-  send x finish
-  i=19
-  send x
-  send x finish
-k=2
-send J
-send J finish2
-  i=0
-  send x
-  send x finish
-  i=1
-  send x
-  send x finish
-  i=2
-  send x
-  send x finish
-  i=3
-  send x
-  send x finish
-  i=4
-  send x
-  send x finish
-  i=5
-  send x
-  send x finish
-  i=6
-  send x
-  send x finish
-  i=7
-  send x
-  send x finish
-  i=8
-  send x
-  send x finish
-  i=9
-  send x
-  send x finish
-  i=10
-  send x
-  send x finish
-  i=11
-  send x
-  send x finish
-  i=12
-  send x
-  send x finish
-  i=13
-  send x
-  send x finish
-  i=14
-  send x
-  send x finish
-  i=15
-  send x
-  send x finish
-  i=16
-  send x
-  send x finish
-  i=17
-  send x
-  send x finish
-  i=18
-  send x
-  send x finish
-  i=19
-  send x
-  send x finish
-k=3
-send J
-send J finish3
-  i=0
-  send x
-  send x finish
-  i=1
-  send x
-  send x finish
-  i=2
-  send x
-  send x finish
-  i=3
-  send x
-  send x finish
-  i=4
-  send x
-  send x finish
-  i=5
-  send x
-  send x finish
-  i=6
-  send x
-  send x finish
-  i=7
-  send x
-  send x finish
-  i=8
-  send x
-  send x finish
-  i=9
-  send x
-  send x finish
-  i=10
-  send x
-  send x finish
-  i=11
-  send x
-  send x finish
-  i=12
-  send x
-  send x finish
-  i=13
-  send x
-  send x finish
-  i=14
-  send x
-  send x finish
-  i=15
-  send x
-  send x finish
-  i=16
-  send x
-  send x finish
-  i=17
-  send x
-  send x finish
-  i=18
-  send x
-  send x finish
-  i=19
-  send x
-  send x finish
-k=4
-send J
-send J finish4
-  i=0
-  send x
-  send x finish
-  i=1
-  send x
-  send x finish
-  i=2
-  send x
-  send x finish
-  i=3
-  send x
-  send x finish
-  i=4
-  send x
-  send x finish
-  i=5
-  send x
-  send x finish
-  i=6
-  send x
-  send x finish
-  i=7
-  send x
-  send x finish
-  i=8
-  send x
-  send x finish
-  i=9
-  send x
-  send x finish
-  i=10
-  send x
-  send x finish
-  i=11
-  send x
-  send x finish
-  i=12
-  send x
-  send x finish
-  i=13
-  send x
-  send x finish
-  i=14
-  send x
-  send x finish
-  i=15
-  send x
-  send x finish
-  i=16
-  send x
-  send x finish
-  i=17
-  send x
-  send x finish
-  i=18
-  send x
-  send x finish
-  i=19
-  send x
-  send x finish
-k=5
-send J
-send J finish5
-  i=0
-  send x
-  send x finish
-  i=1
-  send x
-  send x finish
-  i=2
-  send x
-  send x finish
-  i=3
-  send x
-  send x finish
-  i=4
-  send x
-  send x finish
-  i=5
-  send x
-  send x finish
-  i=6
-  send x
-  send x finish
-  i=7
-  send x
-  send x finish
-  i=8
-  send x
-  send x finish
-  i=9
-  send x
-  send x finish
-  i=10
-  send x
-  send x finish
-  i=11
-  send x
-  send x finish
-  i=12
-  send x
-  send x finish
-  i=13
-  send x
-  send x finish
-  i=14
-  send x
-  send x finish
-  i=15
-  send x
-  send x finish
-  i=16
-  send x
-  send x finish
-  i=17
-  send x
-  send x finish
-  i=18
-  send x
-  send x finish
-  i=19
-  send x
-  send x finish
-k=6
-send J
-send J finish6
-  i=0
-  send x
-  send x finish
-  i=1
-  send x
-  send x finish
-  i=2
-  send x
-  send x finish
-  i=3
-  send x
-  send x finish
-  i=4
-  send x
-  send x finish
-  i=5
-  send x
-  send x finish
-  i=6
-  send x
-  send x finish
-  i=7
-  send x
-  send x finish
-  i=8
-  send x
-  send x finish
-  i=9
-  send x
-  send x finish
-  i=10
-  send x
-  send x finish
-  i=11
-  send x
-  send x finish
-  i=12
-  send x
-  send x finish
-  i=13
-  send x
-  send x finish
-  i=14
-  send x
-  send x finish
-  i=15
-  send x
-  send x finish
-  i=16
-  send x
-  send x finish
-  i=17
-  send x
-  send x finish
-  i=18
-  send x
-  send x finish
-  i=19
-  send x
-  send x finish
-k=7
-send J
-send J finish7
-  i=0
-  send x
-  send x finish
-  i=1
-  send x
-  send x finish
-  i=2
-  send x
-  send x finish
-  i=3
-  send x
-  send x finish
-  i=4
-  send x
-  send x finish
-  i=5
-  send x
-  send x finish
-  i=6
-  send x
-  send x finish
-  i=7
-  send x
-  send x finish
-  i=8
-  send x
-  send x finish
-  i=9
-  send x
-  send x finish
-  i=10
-  send x
-  send x finish
-  i=11
-  send x
-  send x finish
-  i=12
-  send x
-  send x finish
-  i=13
-  send x
-  send x finish
-  i=14
-  send x
-  send x finish
-  i=15
-  send x
-  send x finish
-  i=16
-  send x
-  send x finish
-  i=17
-  send x
-  send x finish
-  i=18
-  send x
-  send x finish
-  i=19
-  send x
-  send x finish
-k=8
-send J
-send J finish8
-  i=0
-  send x
-  send x finish
-  i=1
-  send x
-  send x finish
-  i=2
-  send x
-  send x finish
-  i=3
-  send x
-  send x finish
-  i=4
-  send x
-  send x finish
-  i=5
-  send x
-  send x finish
-  i=6
-  send x
-  send x finish
-  i=7
-  send x
-  send x finish
-  i=8
-  send x
-  send x finish
-  i=9
-  send x
-  send x finish
-  i=10
-  send x
-  send x finish
-  i=11
-  send x
-  send x finish
-  i=12
-  send x
-  send x finish
-  i=13
-  send x
-  send x finish
-  i=14
-  send x
-  send x finish
-  i=15
-  send x
-  send x finish
-  i=16
-  send x
-  send x finish
-  i=17
-  send x
-  send x finish
-  i=18
-  send x
-  send x finish
-  i=19
-  send x
-  send x finish
-k=9
-send J
-send J finish9
-  i=0
-  send x
-  send x finish
-  i=1
-  send x
-  send x finish
-  i=2
-  send x
-  send x finish
-  i=3
-  send x
-  send x finish
-  i=4
-  send x
-  send x finish
-  i=5
-  send x
-  send x finish
-  i=6
-  send x
-  send x finish
-  i=7
-  send x
-  send x finish
-  i=8
-  send x
-  send x finish
-  i=9
-  send x
-  send x finish
-  i=10
-  send x
-  send x finish
-  i=11
-  send x
-  send x finish
-  i=12
-  send x
-  send x finish
-  i=13
-  send x
-  send x finish
-  i=14
-  send x
-  send x finish
-  i=15
-  send x
-  send x finish
-  i=16
-  send x
-  send x finish
-  i=17
-  send x
-  send x finish
-  i=18
-  send x
-  send x finish
-  i=19
-  send x
-  send x finish
 Finish FPGA send Data
 Receive Output
 k=0
-  Energy = -14.085
-  Spin = 
-1
-1
-1
-1
-1
-1
--1
-1
-1
-1
--1
-1
--1
--1
-1
-1
--1
--1
-1
--1
-1
--1
--1
-1
--1
-1
-1
-1
-1
-1
+BEST ENERGY = -31.9475
+Spin = 
 -1
 -1
 -1
@@ -673,6 +13,17 @@ k=0
 -1
 1
 -1
+-1
+-1
+1
+-1
+-1
+1
+-1
+1
+1
+-1
+1
 1
 1
 1
@@ -681,48 +32,64 @@ k=0
 -1
 -1
 1
+-1
+1
+1
+-1
+1
+1
+-1
+-1
+-1
+1
+-1
+1
+1
+-1
+1
 1
 -1
 -1
 1
 -1
-0
--1
--1
+1
 1
 -1
 1
 1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
 1
-1
-1
+-1
 1
 -1
 -1
 k=1
-  Energy = -15.9624
-  Spin = 
--1
-1
--1
-1
-1
-1
--1
-1
--1
--1
-1
+BEST ENERGY = -31.9519
+Spin = 
 -1
 1
 1
 -1
-1
-1
+-1
+-1
+-1
 1
 1
 1
 -1
+-1
+-1
+-1
+-1
+1
+1
+1
 1
 -1
 1
@@ -735,44 +102,6 @@ k=1
 -1
 1
 1
-1
--1
-1
--1
-1
--1
--1
-1
-1
--1
--1
-1
--1
--1
-1
--1
--1
-1
-1
-1
-1
--1
--1
--1
--1
-1
-1
-1
--1
-1
-1
--1
-k=2
-  Energy = -15.5366
-  Spin = 
-1
--1
--1
 -1
 -1
 1
@@ -781,20 +110,11 @@ k=2
 -1
 1
 -1
-1
-1
--1
--1
-1
--1
--1
 -1
 1
 1
 1
 -1
-1
-1
 -1
 -1
 -1
@@ -803,70 +123,30 @@ k=2
 -1
 1
 1
--1
--1
--1
-1
 1
 -1
 1
 -1
--1
--1
-1
-1
-1
-1
-1
--1
-1
--1
-1
-1
-1
--1
--1
-1
--1
--1
-1
--1
-1
--1
-1
-1
-k=3
-  Energy = -13.646
-  Spin = 
 -1
 0
--1
--1
-1
-1
-1
-1
--1
-1
--1
-1
-1
-1
-1
-1
--1
-1
--1
-1
 1
 -1
 -1
 -1
-1
-1
 -1
 1
 -1
+0
+k=2
+BEST ENERGY = -31.9941
+Spin = 
+-1
+-1
+-1
+-1
+1
+-1
+1
 1
 1
 -1
@@ -876,6 +156,80 @@ k=3
 1
 -1
 1
+-1
+-1
+-1
+1
+-1
+1
+1
+1
+-1
+1
+1
+1
+-1
+1
+-1
+-1
+-1
+-1
+-1
+-1
+1
+-1
+-1
+1
+1
+-1
+1
+-1
+-1
+-1
+-1
+1
+-1
+1
+1
+-1
+-1
+1
+1
+1
+-1
+-1
+1
+1
+-1
+1
+1
+-1
+1
+k=3
+BEST ENERGY = -31.896
+Spin = 
+1
+1
+1
+1
+-1
+1
+1
+1
+1
+-1
+-1
+1
+1
+-1
+1
+-1
+1
+-1
+-1
+1
+-1
+1
 1
 -1
 1
@@ -886,26 +240,78 @@ k=3
 1
 1
 -1
+1
+1
+1
+1
 -1
+-1
+1
+1
+1
+1
+1
+1
+1
+1
+-1
+-1
+1
 1
 -1
 -1
 -1
 -1
--1
--1
-1
 1
 -1
+-1
 1
+1
+-1
 1
 -1
 1
 -1
 -1
 k=4
-  Energy = -14.75
-  Spin = 
+BEST ENERGY = -31.9692
+Spin = 
+1
+-1
+1
+-1
+-1
+1
+1
+-1
+1
+1
+1
+1
+-1
+-1
+1
+1
+-1
+1
+1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+1
+-1
+-1
+-1
+1
+-1
+-1
+-1
+1
+-1
 -1
 1
 1
@@ -913,7 +319,10 @@ k=4
 1
 1
 -1
+1
 -1
+-1
+1
 1
 -1
 1
@@ -921,33 +330,28 @@ k=4
 -1
 -1
 -1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
 1
+-1
+1
+k=5
+BEST ENERGY = -31.9956
+Spin = 
+-1
+-1
+1
+-1
 -1
 0
 -1
--1
 1
--1
-1
--1
--1
-1
-1
--1
-1
--1
--1
-1
--1
-1
-1
-1
-1
--1
--1
--1
-1
--1
 -1
 1
 -1
@@ -959,44 +363,11 @@ k=4
 -1
 -1
 1
--1
--1
--1
--1
--1
--1
 1
 1
 -1
 -1
 1
-1
-k=5
-  Energy = -14.5137
-  Spin = 
--1
-1
--1
--1
-1
--1
-1
--1
--1
-1
--1
-1
--1
-1
--1
--1
--1
--1
--1
--1
-1
--1
--1
 -1
 1
 1
@@ -1004,13 +375,18 @@ k=5
 1
 1
 1
-1
+-1
+-1
 -1
 1
 -1
 -1
 1
+-1
 1
+1
+1
+-1
 -1
 1
 1
@@ -1023,34 +399,21 @@ k=5
 1
 -1
 -1
-1
 -1
 -1
 1
 -1
-1
 -1
 -1
 1
-1
-1
 -1
-1
-1
 -1
 1
 k=6
-  Energy = -14.7959
-  Spin = 
--1
--1
+BEST ENERGY = -31.9863
+Spin = 
 -1
 1
-1
--1
--1
--1
--1
 -1
 -1
 1
@@ -1058,13 +421,13 @@ k=6
 1
 -1
 1
+1
+-1
 -1
 -1
 -1
 1
--1
 1
--1
 1
 1
 1
@@ -1075,26 +438,17 @@ k=6
 -1
 1
 -1
--1
--1
-1
 1
 -1
--1
--1
--1
-1
--1
-1
-1
-1
 1
 1
 -1
 -1
 -1
 1
+1
 -1
+1
 -1
 -1
 1
@@ -1103,36 +457,47 @@ k=6
 -1
 -1
 1
+1
+1
+1
+-1
+1
+1
+1
+1
+-1
+1
+1
+-1
+-1
 -1
 -1
 1
+1
+1
+-1
 -1
 k=7
-  Energy = -15.5239
-  Spin = 
+BEST ENERGY = -31.9807
+Spin = 
+1
+-1
+1
+1
+-1
+1
+1
+1
+-1
+-1
+-1
+1
 1
 -1
 1
 -1
 -1
-1
 -1
-1
--1
--1
-1
-1
--1
--1
-1
--1
--1
-1
-1
-1
-0
-1
-1
 -1
 -1
 -1
@@ -1141,43 +506,55 @@ k=7
 1
 -1
 1
-1
--1
-1
-1
 -1
 -1
-1
--1
-1
--1
--1
-1
-1
 -1
 -1
 1
 -1
 -1
-1
--1
-1
 -1
 1
 1
--1
 1
 -1
 1
 1
 1
+-1
+-1
+-1
+1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
 1
 1
 1
+1
+1
+-1
+-1
+-1
+-1
+-1
 -1
 k=8
-  Energy = -14.9233
-  Spin = 
+BEST ENERGY = -31.9646
+Spin = 
+1
+-1
+1
+-1
+-1
+1
+1
 -1
 1
 -1
@@ -1187,51 +564,7 @@ k=8
 -1
 -1
 -1
-1
 -1
-1
--1
--1
-1
-1
-1
-1
-1
--1
--1
--1
--1
--1
-1
-1
--1
--1
--1
-1
-1
--1
--1
--1
-1
-1
-1
-1
--1
--1
-1
-1
--1
-1
--1
--1
-1
-1
-1
--1
-1
-1
--1
-1
 -1
 -1
 -1
@@ -1239,13 +572,78 @@ k=8
 -1
 -1
 1
+-1
 1
 1
+1
+1
+1
+-1
+1
+1
+-1
+-1
+-1
+-1
+1
+-1
+-1
+1
+-1
+-1
+1
+-1
+-1
+1
+-1
+-1
+-1
+1
+-1
+1
+-1
+1
+1
+-1
+-1
+-1
+1
+1
+1
+-1
 1
 -1
 k=9
-  Energy = -15.5962
-  Spin = 
+BEST ENERGY = -31.9988
+Spin = 
+1
+-1
+1
+-1
+-1
+1
+-1
+-1
+1
+-1
+1
+-1
+-1
+1
+-1
+1
+1
+-1
+1
+1
+1
+-1
+1
+-1
+1
+-1
+-1
+1
 -1
 -1
 -1
@@ -1256,23 +654,9 @@ k=9
 -1
 -1
 1
--1
--1
 1
 1
 1
-1
--1
-1
--1
--1
--1
-1
-1
-1
-1
-1
--1
 1
 1
 1
@@ -1280,6 +664,10 @@ k=9
 -1
 1
 -1
+1
+-1
+1
+1
 -1
 -1
 -1
@@ -1287,31 +675,13 @@ k=9
 1
 -1
 -1
--1
--1
--1
-1
-1
-1
-1
--1
 1
 -1
 -1
 -1
 1
-1
-1
-1
-1
--1
-1
-1
-1
-1
--1
 1
 End Receive Output
 Finish 
 
-Ising on FPGA       :      1 calls; 3873.777 msecs total time
+Ising on FPGA       :      1 calls; 194937.594 msecs total time

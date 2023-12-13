@@ -1,14 +1,15 @@
 #include "ap_fixed.h"
-#include "hls_half.h"
 #include "ap_int.h"
 #include <hls_stream.h>
-
-typedef ap_uint<32> bit32_t;
 
 #define N 65
 #define MAX_WIDTH 20
 #define intBits 2
 #define numProblems 10
+
+typedef ap_uint<32> bit32_t;
+typedef ap_uint<MAX_WIDTH> bit_Width_t;
+typedef ap_uint<2>  bit2_t;
 
 typedef ap_fixed<MAX_WIDTH, intBits> data_type_J;       // weights matrix
 typedef ap_fixed<MAX_WIDTH, intBits+1> data_type_x;     // spain vector
@@ -29,7 +30,7 @@ class AHC{
 
         void ahc_solver(data_type_x x_init[N]);
 
-        void matmul();
+        void Mat_Vec_Mal();
         void update();
         void setSpins();
         void IsingEnergy();

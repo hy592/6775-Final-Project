@@ -82,7 +82,7 @@ void AHC::setSpins(){
 }
 
 // Matrix vector product
-void AHC::matmul()
+void AHC::Mat_Vec_Mal()
 {
 	#pragma HLS INLINE off
 	// Matrix vector product
@@ -94,12 +94,11 @@ void AHC::matmul()
 
 	// using column method MVM = \sum_j J[:][j] * x[j]
 	MVM_outer:
-	for(int i=0; i<N; i++){
 		// for each element in x
-
+	for(int j = 0; j < N; j++){
 		#pragma HLS PIPELINE
 		MVM_inner:
-		for(int j = 0; j < N; j++){
+		for(int i=0; i<N; i++){
 			// multiply with each element on i th column of J
 			if(this->x[j] > 0){
 
@@ -252,14 +251,14 @@ void AHC::ahc_solver(
 	updateX(x_init);
 
 	setSpins();	// initialize vectors
-	matmul();
+	Mat_Vec_Mal();
 
 	TIME_STEP_LOOP:
 	for(int time_step=0; time_step < num_time_steps; time_step++){
 		update();
 		IsingEnergy();
 		setSpins();
-		matmul();
+		Mat_Vec_Mal();
 	}
 }
 
@@ -324,7 +323,7 @@ void dut(hls::stream<bit32_t> &strm_in, hls::stream<bit32_t> &strm_out) {
 	
 	// return the best energy
 	bestEnergy = ahc_instance.bestEnergySpins(bestSpinsOut);
-	output_energy(MAX_WIDTH-1,0) = reinterpret_cast<bit16_t&>(bestEnergy);
+	output_energy(MAX_WIDTH-1,0) = bestEnergy(MAX_WIDTH-1,0);
 	strm_out.write(output_energy);
 
 	// write out the result

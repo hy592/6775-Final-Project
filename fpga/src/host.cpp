@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
   
   data_type_J test_data_J;
   data_type_x test_data_X;
-  bit16_t energy_fpga[numProblems];
+  bit_Width_t energy_fpga[numProblems];
   bit2_t spin_fpga[numProblems][matrix_size];
 
   data_type_e energy_ref[numProblems];
