@@ -32,9 +32,9 @@ AHC::AHC(){
 	this->dt   = 0.01;
 	this->r    = 0.98;
 	this->beta = 1;
-	this->coupling_strength = 0.20;
-	this->mu = 1.0;
-	this->num_time_steps = 3;
+	this->coupling_strength = 0.02;
+	this->mu = 1;
+	this->num_time_steps = 200;
 	this->target_a_baseline = 0.2;
 	this->target_a = target_a_baseline;
 
@@ -58,8 +58,7 @@ AHC::AHC(){
 // This function update the lastSpins based on the current spin values
 // This is used to determine the sign of the spins in the MVM
 void AHC::setSpins(){
-	// cout << endl;
-	// cout << "INIT SPINS ";
+
 
 	#pragma HLS INLINE off
 	setSpins_loop:
@@ -67,19 +66,19 @@ void AHC::setSpins(){
 		#pragma HLS PIPELINE
 		if(this->x[i] > 0){
 			this->lastSpins[i] = 1;
-			// cout << "1, ";
+
 		}
 		else if(this->x[i] < 0){
 			this->lastSpins[i] = -1;
-			// cout << "-1, ";
+
 
 		}
 		else{
 			this->lastSpins[i] = 0;
-			// cout << "0, ";
+
 		}
 	}
-	// cout << endl;
+	//cout << endl;
 }
 
 // Matrix vector product
@@ -89,10 +88,8 @@ void AHC::matmul()
 	// Matrix vector product
 	// MVM = (J).dot(np.sign(x))
 	for (int row = 0; row < N; row++) {
-		// cout << "MVM[row] is " << MVM_out[row] << " ";
 		#pragma HLS PIPELINE
 		this->MVM_out[row] = 0.0;
-		// cout << endl;
 	}
 
 	// using column method MVM = \sum_j J[:][j] * x[j]
@@ -100,27 +97,21 @@ void AHC::matmul()
 	for(int i=0; i<N; i++){
 		// for each element in x
 
-		#pragma HLS PIPELINE II=33
+		#pragma HLS PIPELINE
 		MVM_inner:
 		for(int j = 0; j < N; j++){
 			// multiply with each element on i th column of J
-			// cout << this->x[j] << "";
 			if(this->x[j] > 0){
-				// cout << "POS " << this->J[i][j] << endl;
 
 				this->MVM_out[i] += this->J[i][j];
 			}
 			else if(this->x[j] < 0){
-				// cout << "NEG " << -(this->J[i][j]) << endl;
 
 				this->MVM_out[i] += -(this->J[i][j]);
 			}
 
 			else {
 				this->MVM_out[i] += 0;
-
-
-			 	// cout << "NADA";
 
 			 }
 		}
@@ -161,16 +152,29 @@ void AHC::update(){
 	// #pragma HLS ARRAY_PARTITION variable=xx dim=0 complete
 	// #pragma HLS ARRAY_PARTITION variable=de dim=0 complete
 	
+	//int spinFlips = 0;
+	//cout << "x update IS ";
+
+	data_type_x prevX;
 	update_spin_and_error:
 	for(int i=0; i<N; i++){
 		#pragma HLS PIPELINE
-
+		prevX = x[i];
 		
 		// Update spin vector
 		this->x[i] += dt * (coupling_strength * this->MVM_out[i])*this->e[i];
-		xx[i] = (this->x[i] * this->x[i]);
-		this->x[i] += -dt * this->x[i] * ((data_type_x(0.02)) + mu*xx);
+
+		//if(prevX != x[i])
+		//	spinFlips +=1;
+		xx[i] = (this->x[i] << 2);
+		//cout << -dt * this->x[i] * ((data_type_x(0.02)) + mu*xx[i]) << " ";
+
+		this->x[i] += -dt * this->x[i] * ((data_type_x(0.02)) + mu*xx[i]); //0.2 is r-1 (1.2-1)==0.2
+
+
 		this->de[i] = dt*(-(this->beta) * this->e[i] * (xx[i] - target_a));
+
+		//cout << de[i] << " ";
         this->e[i] += de[i];
 		
 		/////////////////////////// option 2 using shift ////////////////////////////
@@ -196,6 +200,8 @@ void AHC::update(){
 		// de = ((this_tmp_de >> 7) + (this_tmp_de >> 9)) * (this->e[i]);
 		// this->e[i] += de;
 	}
+	//cout << endl;
+
 }
 
 void AHC::reset(){
@@ -213,11 +219,9 @@ void AHC::updateX(
 	// ap_fixed<MAX_WIDTH, 2> coupling_strength_new, ap_fixed<MAX_WIDTH,2> new_mu
 ){
 
-	// cout << " XINIT ";
 	initialize_vectors:for(int i=0; i<N; i++){
 		this->e[i] = 1.0;
 		this->x[i] = x_init[i];
-		// cout << this->x[i] << ", ";
 		// this->lastSpins[i] = x_init[i];
 		// this->de[i] = 0;
 		// this->coupling_strength = coupling_strength_new;
@@ -253,10 +257,9 @@ void AHC::ahc_solver(
 	TIME_STEP_LOOP:
 	for(int time_step=0; time_step < num_time_steps; time_step++){
 		update();
+		IsingEnergy();
 		setSpins();
 		matmul();
-		setSpins();
-		IsingEnergy();
 	}
 }
 
@@ -269,22 +272,6 @@ data_type_e AHC::bestEnergySpins(
 
 	return this->bestEnergy;
 }
-
-// void ahc_top(
-// 	data_type_J J_matrix[N][N], 
-// 	data_type_x x_init[N], 
-// 	spin_sign bestSpinsOut[N]
-// ){
-// 	// Partition the first dim
-// 	#pragma HLS ARRAY_PARTITION variable=J_matrix dim=1 complete
-// 	#pragma HLS ARRAY_PARTITION variable=x_init dim=1 complete
-// 	#pragma HLS ARRAY_PARTITION variable=bestSpinsOut dim=1 complete
-
-// 	// #pragma HLS INTERFACE bram port=bestSpinsOut
-// 	static AHC ahc_instance(J_matrix);
-// 	ahc_instance.ahc_solver(x_init, bestSpinsOut);
-// }
-
 //----------------------------------------------------------
 // Top function
 //----------------------------------------------------------
