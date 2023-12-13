@@ -1,19 +1,19 @@
 #include "ap_fixed.h"
+#include "hls_half.h"
 #include "ap_int.h"
 #include <hls_stream.h>
 
 typedef ap_uint<32> bit32_t;
-typedef ap_uint<16> bit16_t;
-typedef ap_uint<2> bit2_t;
 
 #define N 65
-#define MAX_WIDTH 16
+#define MAX_WIDTH 20
 #define intBits 2
 #define numProblems 10
 
 typedef ap_fixed<MAX_WIDTH, intBits> data_type_J;       // weights matrix
 typedef ap_fixed<MAX_WIDTH, intBits+1> data_type_x;     // spain vector
-typedef ap_fixed<MAX_WIDTH, intBits+3> data_type_e;     // energy vector
+typedef ap_fixed<MAX_WIDTH, intBits+4> data_type_e;     // energy vector
+typedef half data_t;  // Use data-type half
 typedef ap_int<2> spin_sign;
 
 // Maximize the number of MIMO channels N we can decode per FPGA, 
@@ -45,14 +45,14 @@ class AHC{
         void updateJ(data_type_J J_init[N][N]);
 
     private:
-        ap_fixed<MAX_WIDTH, 2> dt;
-        ap_fixed<MAX_WIDTH, 2> r;
-        ap_fixed<MAX_WIDTH, 2> beta;
-        ap_fixed<MAX_WIDTH, 2> coupling_strength;
+        ap_fixed<MAX_WIDTH, 3> dt;
+        ap_fixed<MAX_WIDTH, 3> r;
+        ap_fixed<MAX_WIDTH, 3> beta;
+        ap_fixed<MAX_WIDTH, 3> coupling_strength;
 
         ap_fixed<MAX_WIDTH, 3> mu;
-        ap_fixed<MAX_WIDTH, 2> target_a_baseline;
-        ap_fixed<MAX_WIDTH, 2> target_a;
+        ap_fixed<MAX_WIDTH, 3> target_a_baseline;
+        ap_fixed<MAX_WIDTH, 3> target_a;
 
         int num_time_steps;
 
