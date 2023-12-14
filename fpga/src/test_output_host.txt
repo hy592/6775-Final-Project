@@ -684,4 +684,4 @@ Spin =
 End Receive Output
 Finish 
 
-Ising on FPGA       :      1 calls; 194937.594 msecs total time
+Ising on FPGA       :      1 calls; 196677.594 msecs total time

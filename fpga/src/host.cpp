@@ -143,7 +143,7 @@ int main(int argc, char **argv) {
     nbytes = read(fdr, (void *)&(energy_received), sizeof(energy_received));
     assert(nbytes == sizeof(energy_received));
     energy_fpga[k] = energy_received(MAX_WIDTH-1,0);
-    energy_result = reinterpret_cast<data_type_e&>(energy_fpga[k]);
+    energy_result(MAX_WIDTH-1,0) = energy_received(MAX_WIDTH-1,0);
     std::cout << "BEST ENERGY = " << energy_result << std::endl;
 
     std::cout << "Spin = " << std::endl;
