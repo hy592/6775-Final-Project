@@ -2,24 +2,8 @@
 #include "iostream"
 //#include <fstream>
 
-//Define output array
-
-//#define DEBUG
-
-#ifdef DEBUG
 using std::cout;
 using std::endl;
-float x1_debug[150][65];
-float x2_debug[150][65];
-#endif
-
-
-#define LAST
-using std::cout;
-using std::endl;
-
-
-
 
 AHC::AHC(){
 // Partition local variables to improve bandwidth
@@ -37,45 +21,24 @@ AHC::AHC(){
 	this->num_time_steps = 200;
 	this->target_a_baseline = 0.2;
 	this->target_a = target_a_baseline;
-
-	// Initialize the spins, J matrix and MVM output
-	// initialize_vectors:
-	// for(int i=0;i<N;i++){
-	// 	this->e[i] = 1.0;
-	// 	// this->x[i] = x_init[i];
-	// }
-
-    // initialize_matrix:
-	// for(int j=0;j<N;j++){
-	// #pragma HLS PIPELINE
-	// 	for(int i=0;i<N;i++){
-    //         this->J[i][j] = J_init[i][j];
-    //     }
-    // }
 }
 
 // setSpins
 // This function update the lastSpins based on the current spin values
 // This is used to determine the sign of the spins in the MVM
 void AHC::setSpins(){
-
-
 	#pragma HLS INLINE off
 	setSpins_loop:
 	for(int i=0; i<N; i++){
 		#pragma HLS PIPELINE
 		if(this->x[i] > 0){
 			this->lastSpins[i] = 1;
-
 		}
 		else if(this->x[i] < 0){
 			this->lastSpins[i] = -1;
-
-
 		}
 		else{
 			this->lastSpins[i] = 0;
-
 		}
 	}
 	//cout << endl;
@@ -94,25 +57,21 @@ void AHC::Mat_Vec_Mal()
 
 	// using column method MVM = \sum_j J[:][j] * x[j]
 	MVM_outer:
-		// for each element in x
+	// for each element in x
 	for(int j = 0; j < N; j++){
 		#pragma HLS PIPELINE
 		MVM_inner:
 		for(int i=0; i<N; i++){
 			// multiply with each element on i th column of J
 			if(this->x[j] > 0){
-
 				this->MVM_out[i] += this->J[i][j];
 			}
 			else if(this->x[j] < 0){
-
 				this->MVM_out[i] += -(this->J[i][j]);
 			}
-
 			else {
 				this->MVM_out[i] += 0;
-
-			 }
+			}
 		}
 	}
 }
@@ -145,14 +104,8 @@ void AHC::IsingEnergy(){
 void AHC::update(){
 	#pragma HLS INLINE off
 	// #pragma HLS LATENCY min=4 max=10
-	// data_type_x xx[N];
-	// data_type_e de[N];
-
 	// #pragma HLS ARRAY_PARTITION variable=xx dim=0 complete
 	// #pragma HLS ARRAY_PARTITION variable=de dim=0 complete
-	
-	//int spinFlips = 0;
-	//cout << "x update IS ";
 
 	data_type_x prevX;
 	update_spin_and_error:
@@ -162,17 +115,12 @@ void AHC::update(){
 		
 		// Update spin vector
 		this->x[i] += dt * (coupling_strength * this->MVM_out[i])*this->e[i];
-
 		//if(prevX != x[i])
 		//	spinFlips +=1;
 		xx[i] = (this->x[i] << 2);
 		//cout << -dt * this->x[i] * ((data_type_x(0.02)) + mu*xx[i]) << " ";
-
 		this->x[i] += -dt * this->x[i] * ((data_type_x(0.02)) + mu*xx[i]); //0.2 is r-1 (1.2-1)==0.2
-
-
 		this->de[i] = dt*(-(this->beta) * this->e[i] * (xx[i] - target_a));
-
 		//cout << de[i] << " ";
         this->e[i] += de[i];
 		
@@ -306,7 +254,7 @@ void dut(hls::stream<bit32_t> &strm_in, hls::stream<bit32_t> &strm_out) {
 	}
 	ahc_instance.updateJ(J_in);
 
-	// run 100 sets of X
+	// run 20 sets of X
 	for (int x_iter=0; x_iter<20; x_iter++){
 		#pragma HLS pipeline off
 		// read x_init

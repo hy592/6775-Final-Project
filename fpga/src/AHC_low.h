@@ -69,10 +69,4 @@ class AHC{
         spin_sign lastSpins[N];
 };
 
-// void ahc_top(
-//     data_type_J J_matrix[N][N], 
-//     data_type_x x_init[N], 
-//     spin_sign bestSpinsOut[N]
-// );
-
 void dut(hls::stream<bit32_t> &strm_in, hls::stream<bit32_t> &strm_out);

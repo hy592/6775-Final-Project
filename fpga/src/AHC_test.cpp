@@ -78,27 +78,15 @@ int main()
       }
     }
   }
-
   x_init_file.close();
 
-  // int numProblems = 10;
-
-  int startNum = 0;
-
   //  Do something with the matrix values here...
-
+  int startNum = 0;
   for ( int k = startNum; k < startNum + numProblems; k++ ) {
     // ifstream input_file1( JMATRICES + (string)"/DI_MIMO_J_Conv_11_29_16_2_" + std::to_string( k ) + (string)".txt" );
     ifstream input_file1((string)"fixed_pt_data" + (string)"/DI_MIMO_J_Conv_11_29_16_2_" + to_string(k) + (string)".txt");
     // cout << JMATRICES + (string)"/DI_MIMO_J_Conv_11_29_16_2_" + to_string( k ) + (string)".txt" << endl;
     cout << (string)"fixed_pt_data" + (string)"/DI_MIMO_J_Conv_11_29_16_2_" + to_string(k) + (string)".txt" << endl;
-
-#ifdef DEBUG
-    cout << "INIT SPINS" << endl;
-    for ( int z = 0; z < matrix_size; z++ )
-      cout << random_array[z] << " ";
-    cout << endl;
-#endif DEBUG
 
     for ( int i = 0; i < matrix_size; i++ ) {
       for ( int j = 0; j < matrix_size; j++ ) {
