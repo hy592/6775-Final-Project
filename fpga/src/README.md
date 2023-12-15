@@ -116,23 +116,5 @@ mv Makefile_fpga Makefile # for Zedboard Environment
 
 make fpga # builds and runs FPGA experiment
 ```
-
-
-## Testbench
-
-To run the testbench, run ```make test``` in ```fpga/src/```. Currently, we have two implementations: ```AHC_low``` and ```AHC_new```. Modify 
-- ```make test``` in ```fpga/src/Makefile```'s
-- ```#include```s in ```fpga/src/AHC_test.cpp```'s
-
-to change versions.
-
-### Makefile
-
-```cmake
-test: AHC_test
-	g++ ${CFLAGS} -o AHC_test AHC_test.cpp AHC_<low OR new>.cpp
-	./AHC_test > test_output_<low OR new>.txt
-
-AHC_test: AHC_test.cpp
-	g++ ${CFLAGS} -o AHC_test AHC_test.cpp AHC_<low OR new>.cpp  
-```
+## Verification
+By comparing the generated txt file for best energy and paired spins, with the printed result in terminal on Zedboard, they should give the same result. This verify that our dut/host program work correctly.
