@@ -41,3 +41,4 @@ fpga/src/xillydemo.bit
 fpga/src/test_output_host.txt
 fpga/src/test_output_low.txt
 fpga/src/AHC_test
+tb_data.zip

@@ -1,20 +1,46 @@
 #include "ap_fixed.h"
 #include "ap_int.h"
 #include <hls_stream.h>
+#include <ap_axi_sdata.h>
+
+// control to use floating point or fixed point data types
+#define USE_FLOAT 0 // 1 for floating point, 0 for fixed point
+#define USE_6775_FPGA 1
+
+// define the width of the fixed point data types
+#ifndef MAX_WIDTH
+#define MAX_WIDTH 32
+#endif
+
+#ifndef intBits
+#define intBits 8
+#endif
+
+#ifndef fracBits
+#define fracBits 24
+#endif
 
 #define N 65
-#define MAX_WIDTH 20
-#define intBits 2
-#define numProblems 10
 
-typedef ap_uint<32> bit32_t;
-typedef ap_uint<MAX_WIDTH> bit_Width_t;
-typedef ap_uint<2>  bit2_t;
+#define num_anneals 20
 
-typedef ap_fixed<MAX_WIDTH, intBits> data_type_J;       // weights matrix
-typedef ap_fixed<MAX_WIDTH, intBits+1> data_type_x;     // spain vector
-typedef ap_fixed<MAX_WIDTH, intBits+4> data_type_e;     // energy vector
-typedef ap_int<2> spin_sign;
+#if USE_6775_FPGA
+    typedef ap_uint<32> bit32_t;
+    typedef ap_uint<MAX_WIDTH> bit_Width_t;
+    typedef ap_uint<2>  bit2_t;
+#endif
+
+#if USE_FLOAT
+    typedef float data_type_J;
+    typedef float data_type_x;
+    typedef float data_type_e;
+    typedef float spin_sign  ;
+#else
+    typedef ap_fixed<MAX_WIDTH, intBits> data_type_J;
+    typedef ap_fixed<MAX_WIDTH, intBits> data_type_x;
+    typedef ap_fixed<MAX_WIDTH, intBits> data_type_e;
+    typedef ap_int<2> spin_sign;
+#endif
 
 // Maximize the number of MIMO channels N we can decode per FPGA, 
 // subject to a constraint on the maximum allowable error rate.
@@ -27,7 +53,10 @@ class AHC{
 
         data_type_e bestEnergySpins(spin_sign bestSpins[N]);
 
-        void ahc_solver(data_type_x x_init[N]);
+        void ahc_solver(
+			data_type_x x_init[N],
+			data_type_e error_var_init[N]
+		);
 
         void Mat_Vec_Mal();
         void update();
@@ -35,24 +64,38 @@ class AHC{
         void IsingEnergy();
 
         void reset();
-
+        //void ahc_solver(data_type_x x_init[N]);
         void writeDebug(int index);
         void updateX(
-            data_type_x x_init[N]
+            data_type_x x_init[N],
+			data_type_e error_var_init[N]
             // ap_fixed<MAX_WIDTH, 2> coupling_strength_new, 
             // ap_fixed<MAX_WIDTH,2> new_mu
         );
         void updateJ(data_type_J J_init[N][N]);
 
     private:
-        ap_fixed<MAX_WIDTH, 3> dt;
-        ap_fixed<MAX_WIDTH, 3> r;
-        ap_fixed<MAX_WIDTH, 3> beta;
-        ap_fixed<MAX_WIDTH, 3> coupling_strength;
+        #if USE_FLOAT
+            float dt;
+            float r;
+            float beta;
+            float gamma;
+            float coupling_str;
+            float mu;
+            float target_a_baseline;
+            float target_a;
+        #else
+            ap_fixed<MAX_WIDTH, intBits> dt;
+            ap_fixed<MAX_WIDTH, intBits> r;
+            ap_fixed<MAX_WIDTH, intBits> beta;
+            ap_fixed<MAX_WIDTH, intBits> gamma;
+            ap_fixed<MAX_WIDTH, intBits> coupling_str;
 
-        ap_fixed<MAX_WIDTH, 3> mu;
-        ap_fixed<MAX_WIDTH, 3> target_a_baseline;
-        ap_fixed<MAX_WIDTH, 3> target_a;
+            ap_fixed<MAX_WIDTH, intBits> mu;
+            ap_fixed<MAX_WIDTH, intBits> target_a_baseline;
+            ap_fixed<MAX_WIDTH, intBits> target_a;
+        #endif
+
 
         int num_time_steps;
 
@@ -62,11 +105,21 @@ class AHC{
 
         data_type_x MVM_out[N];
         data_type_e de[N];
-        data_type_e e[N];
+        data_type_e error_var[N];
 
         data_type_e bestEnergy = 10;
         spin_sign bestSpins[N];
         spin_sign lastSpins[N];
 };
 
+// void ahc_top(
+//     data_type_J J_matrix[N][N], 
+//     data_type_x x_init[N], 
+//     spin_sign bestSpinsOut[N]
+// );
+
+#if USE_6775_FPGA
 void dut(hls::stream<bit32_t> &strm_in, hls::stream<bit32_t> &strm_out);
+#else
+void dut(data_type_J J_matrix[N][N], data_type_x x_init[N], spin_sign bestSpinsOut[N], data_type_e bestEnergyOut);
+#endif
